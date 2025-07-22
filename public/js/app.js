@@ -13,10 +13,18 @@ class GAA_FeedbackApp {
     }
     
     init() {
-        console.log('🏈 GAA Feedback System Initialized - v1752828500');
+        console.log('🏈 GAA Feedback System Initialized - v1752828700');
         console.log('🏗️ Perfect Form Builder - Enhanced with inline confirmations, anonymous & question bank features!');
         try {
             this.parseURLParams();
+            
+            // Validate required parameters
+            const parameterError = this.validateRequiredParameters();
+            if (parameterError) {
+                this.showParameterError(parameterError);
+                return; // Stop initialization if parameters are invalid
+            }
+            
             this.loadApp();
         } catch (error) {
             console.error('Error during initialization:', error);
@@ -35,34 +43,18 @@ class GAA_FeedbackApp {
         console.log('🔍 Search params:', window.location.search);
         console.log('🔍 All URL params:', Array.from(urlParams.entries()));
         
-        if (!eventIdParam) {
-            this.showError('No event ID provided. Please use ?event-id=YOUR_EVENT_ID in the URL.');
-            return;
-        }
-        
-        if (!userIdParam) {
-            this.showError('No user ID provided. Please use ?user-id=USER_ID in the URL.');
-            return;
-        }
-        
-        if (!userTypeParam) {
-            this.showError('No user type provided. Please use ?user-type=coach or ?user-type=player in the URL.');
-            return;
-        }
+        // Store parameters (validation will be done separately)
         
         // Use the event-id directly (no UUID generation needed)
         this.currentEventId = eventIdParam;
         this.currentClubId = clubIdParam; // Optional parameter
         this.currentUserId = userIdParam; // Required parameter for tracking individual users from Bubble
         
-        // Set user type based on user-type parameter
-        if (userTypeParam.toLowerCase() === 'coach') {
+        // Set user type based on user-type parameter (if provided)
+        if (userTypeParam && userTypeParam.toLowerCase() === 'coach') {
             this.currentUserType = 'coach';
-        } else if (userTypeParam.toLowerCase() === 'player') {
+        } else if (userTypeParam && userTypeParam.toLowerCase() === 'player') {
             this.currentUserType = 'player';
-        } else {
-            this.showError('Invalid user type. Please use ?user-type=coach or ?user-type=player in the URL.');
-            return;
         }
         
         console.log('✅ Event ID from URL:', eventIdParam);
@@ -71,6 +63,66 @@ class GAA_FeedbackApp {
         console.log('✅ User Type from URL:', userTypeParam);
         console.log('✅ Set user type to:', this.currentUserType);
         console.log('✅ this.currentClubId set to:', this.currentClubId);
+    }
+    
+    validateRequiredParameters() {
+        const missingParams = [];
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Check for required parameters
+        if (!urlParams.get('event-id')) {
+            missingParams.push({ param: 'event-id', description: 'Event ID' });
+        }
+        
+        if (!urlParams.get('club-id')) {
+            missingParams.push({ param: 'club-id', description: 'Club ID' });
+        }
+        
+        if (!urlParams.get('user-id')) {
+            missingParams.push({ param: 'user-id', description: 'User ID' });
+        }
+        
+        const userType = urlParams.get('user-type');
+        if (!userType) {
+            missingParams.push({ param: 'user-type', description: 'User Type (coach or player)' });
+        } else if (!['coach', 'player'].includes(userType.toLowerCase())) {
+            missingParams.push({ param: 'user-type', description: 'User Type (must be coach or player)', invalid: true });
+        }
+        
+        return missingParams.length > 0 ? missingParams : null;
+    }
+    
+    showParameterError(missingParams) {
+        console.error('Missing or invalid required parameters:', missingParams);
+        
+        // Hide all other screens
+        document.querySelectorAll('.loading-screen, .error-screen, .interface').forEach(screen => {
+            screen.classList.add('hidden');
+        });
+        
+        // Show parameter error screen
+        const parameterErrorScreen = document.getElementById('parameter-error-screen');
+        parameterErrorScreen.classList.remove('hidden');
+        
+        // Generate error details
+        const errorDetails = document.getElementById('parameter-error-details');
+        const errorMessage = document.getElementById('parameter-error-message');
+        
+        if (missingParams.length === 1 && missingParams[0].param === 'user-type' && missingParams[0].invalid) {
+            errorMessage.textContent = 'Invalid user type provided. Must be either "coach" or "player".';
+        } else {
+            errorMessage.textContent = `Missing required parameters: ${missingParams.length === 1 ? '1 parameter is' : missingParams.length + ' parameters are'} required but not provided.`;
+        }
+        
+        errorDetails.innerHTML = missingParams.map(param => `
+            <div class="missing-param">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>${param.param}:</strong> ${param.description} ${param.invalid ? '(invalid value)' : '(missing)'}
+            </div>
+        `).join('');
+        
+        // Prevent any further app functionality
+        this.parametersValid = false;
     }
     
     async loadApp() {
@@ -325,7 +377,7 @@ class GAA_FeedbackApp {
                         </span>
                     </div>
                 </div>
-                <button class="close-btn" onclick="app.closeTemplatePreview()">
+                <button class="close-btn" onclick="window.app.closeTemplatePreview()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -357,10 +409,10 @@ class GAA_FeedbackApp {
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="app.closeTemplatePreview()">
+                <button class="btn btn-secondary" onclick="window.app.closeTemplatePreview()">
                     Cancel
                 </button>
-                <button class="btn btn-primary" onclick="app.useTemplate()">
+                <button class="btn btn-primary" onclick="window.app.useTemplate()">
                     <i class="fas fa-rocket"></i> Use This Template
                 </button>
             </div>

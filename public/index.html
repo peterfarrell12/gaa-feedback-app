@@ -35,6 +35,28 @@
                         </button>
                     </div>
                 </div>
+                
+                <!-- Parameter Error Screen -->
+                <div id="parameter-error-screen" class="error-screen hidden">
+                    <div class="error-content">
+                        <i class="fas fa-link-slash"></i>
+                        <h2>Invalid Access Link</h2>
+                        <p id="parameter-error-message">This page requires valid parameters to function properly.</p>
+                        <div class="error-details" id="parameter-error-details">
+                            <!-- Error details will be populated here -->
+                        </div>
+                        <div class="error-help">
+                            <h4>How to fix this:</h4>
+                            <p>Please use the proper access link provided by your GAA club or coach. The link should include:</p>
+                            <ul>
+                                <li><strong>Event ID</strong> - Identifies the specific training or match</li>
+                                <li><strong>Club ID</strong> - Your GAA club identifier</li>
+                                <li><strong>User Type</strong> - Either 'coach' or 'player'</li>
+                                <li><strong>User ID</strong> - Your unique user identifier</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Coach Interface -->
                 <div id="coach-interface" class="interface hidden">
@@ -459,6 +481,6 @@
         </main>
     </div>
 
-    <script src="js/app.js?v=1752828700"></script>
+    <script src="js/app.js?v=1752828800"></script>
 </body>
 </html>
