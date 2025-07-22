@@ -54,16 +54,40 @@
 
                 <!-- Coach Interface -->
                 <div id="coach-interface" class="interface hidden">
-                    <!-- Coach - No Form Created -->
+                    <!-- Coach - No Form Created (Typeform Style) -->
                     <div id="coach-no-form" class="screen">
-                        <div class="screen-content">
-                            <div class="empty-state">
-                                <i class="fas fa-plus-circle"></i>
-                                <h2>No Form Created</h2>
-                                <p>Create a feedback form for this event to start collecting responses.</p>
-                                <button class="btn btn-primary" onclick="showFormBuilder()">
-                                    <i class="fas fa-plus"></i> Create Form
-                                </button>
+                        <div class="typeform-container">
+                            <!-- Header Section -->
+                            <div class="typeform-header">
+                                <div class="typeform-logo">
+                                    <i class="fas fa-football-ball"></i>
+                                </div>
+                                <h1 class="typeform-title">Create your GAA feedback form</h1>
+                                <p class="typeform-subtitle">Choose a template below or start from scratch</p>
+                            </div>
+                            
+                            <!-- Template Gallery -->
+                            <div class="template-gallery">
+                                <div class="template-grid" id="template-grid">
+                                    <!-- Templates will be loaded here -->
+                                </div>
+                                
+                                <!-- Create from Scratch Option -->
+                                <div class="create-scratch-card" onclick="showFormBuilder()">
+                                    <div class="scratch-card-content">
+                                        <div class="scratch-icon">
+                                            <i class="fas fa-magic"></i>
+                                        </div>
+                                        <h3>Start from scratch</h3>
+                                        <p>Build your form from the ground up</p>
+                                        <div class="scratch-badge">Custom</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Footer -->
+                            <div class="typeform-footer">
+                                <p>Need help? Check out our <a href="#" onclick="showFormBuilder()">form builder guide</a></p>
                             </div>
                         </div>
                     </div>

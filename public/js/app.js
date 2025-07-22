@@ -49,8 +49,17 @@ class GAA_FeedbackApp {
         this.currentClubId = clubIdParam; // Optional parameter
         this.currentUserId = userIdParam; // Required parameter for tracking individual players
         
+        // Automatically detect user type based on user-id parameter
+        if (userIdParam === 'coach' || userIdParam.toLowerCase().includes('coach')) {
+            this.currentUserType = 'coach';
+        } else {
+            this.currentUserType = 'player';
+        }
+        
         console.log('✅ Event ID from URL:', eventIdParam);
         console.log('✅ Club ID from URL:', clubIdParam || 'Not provided');
+        console.log('✅ User ID from URL:', userIdParam);
+        console.log('✅ Auto-detected user type:', this.currentUserType);
         console.log('✅ this.currentClubId set to:', this.currentClubId);
     }
     
@@ -159,6 +168,118 @@ class GAA_FeedbackApp {
         this.hideAllCoachScreens();
         document.getElementById('coach-no-form').classList.remove('hidden');
         document.getElementById('coach-no-form').classList.add('active');
+        
+        // Load templates into the gallery
+        this.renderTemplateGallery();
+    }
+    
+    renderTemplateGallery() {
+        const templateGrid = document.getElementById('template-grid');
+        if (!templateGrid || !this.templates) return;
+        
+        templateGrid.innerHTML = '';
+        
+        this.templates.forEach(template => {
+            const templateCard = this.createTemplateCard(template);
+            templateGrid.appendChild(templateCard);
+        });
+    }
+    
+    createTemplateCard(template) {
+        const card = document.createElement('div');
+        card.className = 'template-card';
+        card.onclick = () => this.selectTemplate(template);
+        
+        // Determine template icon based on type
+        let iconClass = 'fas fa-clipboard-list';
+        if (template.type === 'match') iconClass = 'fas fa-futbol';
+        if (template.type === 'training') iconClass = 'fas fa-dumbbell';
+        if (template.type === 'tactical') iconClass = 'fas fa-chess';
+        
+        card.innerHTML = `
+            <div class="template-badge">${template.type}</div>
+            <div class="template-icon">
+                <i class="${iconClass}"></i>
+            </div>
+            <h3>${template.name}</h3>
+            <p>${template.description || 'Comprehensive feedback form for GAA teams'}</p>
+            <div class="template-meta">
+                <div class="template-stat">
+                    <i class="fas fa-layer-group"></i>
+                    <span>${template.sections || 0} sections</span>
+                </div>
+                <div class="template-stat">
+                    <i class="fas fa-question"></i>
+                    <span>${template.questions || 0} questions</span>
+                </div>
+                <div class="template-stat">
+                    <i class="fas fa-clock"></i>
+                    <span>${template.estimatedTime || '5 min'}</span>
+                </div>
+            </div>
+        `;
+        
+        return card;
+    }
+    
+    selectTemplate(template) {
+        console.log('Selected template:', template);
+        this.selectedTemplate = template;
+        
+        // Show template preview or directly create form
+        this.createFormFromTemplate();
+    }
+    
+    async createFormFromTemplate() {
+        if (!this.selectedTemplate) return;
+        
+        try {
+            console.log('Creating form from template:', this.selectedTemplate.name);
+            
+            // Show loading state
+            this.showLoading();
+            
+            const response = await fetch('/api/forms/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    templateId: this.selectedTemplate.id,
+                    eventId: this.currentEventId,
+                    customizations: {
+                        name: `${this.selectedTemplate.name} - Event ${this.currentEventId}`,
+                        created_by: this.currentUserId,
+                        allow_anonymous: false
+                    }
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to create form from template');
+            }
+            
+            const form = await response.json();
+            console.log('Form created from template:', form);
+            
+            // Set as current form and show coach area
+            this.currentForm = {
+                id: form.id,
+                name: form.name,
+                event_identifier: form.event_identifier,
+                structure: this.selectedTemplate.structure
+            };
+            
+            this.hideLoading();
+            this.showCoachFormArea();
+            this.showSuccess(`Form "${this.selectedTemplate.name}" created successfully!`);
+            
+        } catch (error) {
+            console.error('Error creating form from template:', error);
+            this.hideLoading();
+            this.showError('Failed to create form from template: ' + error.message);
+        }
     }
     
     showCoachFormArea() {
