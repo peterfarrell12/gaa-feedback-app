@@ -7,6 +7,7 @@
     "start": "node server-supabase.js",
     "start-mock": "node server.js",
     "dev": "next dev",
+    "build": "echo 'Build completed - Express.js app ready'",
     "test": "node test-runner.js"
   },
   "keywords": [
