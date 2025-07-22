@@ -207,20 +207,26 @@ class GAA_FeedbackApp {
         if (template.type === 'tactical') iconClass = 'fas fa-chess';
         
         card.innerHTML = `
-            <div class="template-badge">${template.type}</div>
-            <div class="template-icon">
-                <i class="${iconClass}"></i>
-            </div>
-            <h3>${template.name}</h3>
-            <p>${template.description || 'Comprehensive feedback form for GAA teams'}</p>
-            <div class="template-meta">
-                <div class="template-stat">
-                    <i class="fas fa-layer-group"></i>
-                    <span>${template.sections || 0} sections</span>
+            <div class="template-content-header">
+                <div class="template-icon">
+                    <i class="${iconClass}"></i>
                 </div>
-                <div class="template-stat">
-                    <i class="fas fa-question"></i>
-                    <span>${template.questions || 0} questions</span>
+                <div class="template-text-content">
+                    <h3>${template.name}</h3>
+                    <p>${template.description || 'Comprehensive feedback form for GAA teams'}</p>
+                </div>
+                <div class="template-badge">${template.type}</div>
+            </div>
+            <div class="template-meta">
+                <div class="template-stats">
+                    <div class="template-stat">
+                        <i class="fas fa-layer-group"></i>
+                        <span>${template.sections || 0} sections</span>
+                    </div>
+                    <div class="template-stat">
+                        <i class="fas fa-question"></i>
+                        <span>${template.questions || 0} questions</span>
+                    </div>
                 </div>
                 <div class="template-stat">
                     <i class="fas fa-clock"></i>
