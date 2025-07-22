@@ -29,24 +29,32 @@ body {
     -moz-osx-font-smoothing: grayscale;
     /* Prevent horizontal overflow */
     overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 16px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
 }
 
 /* Mobile-first responsive container */
 @media (min-width: 640px) {
     .container {
-        padding: 0 20px;
+        padding: 0;
     }
 }
 
 @media (min-width: 1024px) {
     .container {
-        padding: 0 24px;
+        padding: 0;
     }
 }
 
@@ -231,18 +239,23 @@ body {
 
 /* Main Content - Mobile First */
 .main {
-    padding: 16px 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
 }
 
 @media (min-width: 640px) {
     .main {
-        padding: 20px 0;
+        padding: 0;
     }
 }
 
 @media (min-width: 1024px) {
     .main {
-        padding: 24px 0;
+        padding: 0;
     }
 }
 
@@ -5002,9 +5015,10 @@ body {
     position: relative;
     overflow: hidden;
     border-radius: 24px;
-    margin: 20px auto;
-    max-width: calc(100vw - 40px);
-    min-height: fit-content;
+    margin: 0;
+    width: fit-content;
+    min-width: 800px;
+    max-width: 1200px;
 }
 
 /* Add subtle pattern overlay */
@@ -5280,10 +5294,17 @@ body {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+    body {
+        min-height: auto;
+        padding: 10px;
+    }
+    
     .typeform-container {
         padding: 20px 16px;
-        margin: 10px;
-        max-width: calc(100vw - 20px);
+        margin: 0;
+        min-width: auto;
+        width: 100%;
+        max-width: none;
         border-radius: 20px;
     }
     
