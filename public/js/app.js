@@ -289,7 +289,104 @@ class GAA_FeedbackApp {
         console.log('Selected template:', template);
         this.selectedTemplate = template;
         
-        // Show template preview or directly create form
+        // Show template preview popup
+        this.showTemplatePreview(template);
+    }
+    
+    showTemplatePreview(template) {
+        // Create modal overlay
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        modalOverlay.onclick = () => this.closeTemplatePreview();
+        
+        // Create modal content
+        const modal = document.createElement('div');
+        modal.className = 'template-preview-modal';
+        modal.onclick = (e) => e.stopPropagation();
+        
+        // Determine template icon
+        let iconClass = 'fas fa-clipboard-list';
+        if (template.type === 'match') iconClass = 'fas fa-futbol';
+        if (template.type === 'training') iconClass = 'fas fa-dumbbell';
+        if (template.type === 'tactical') iconClass = 'fas fa-chess';
+        
+        modal.innerHTML = `
+            <div class="modal-header">
+                <div class="template-preview-icon">
+                    <i class="${iconClass}"></i>
+                </div>
+                <div class="template-preview-info">
+                    <h2>${template.name}</h2>
+                    <p>${template.description || 'Comprehensive feedback form for GAA teams'}</p>
+                    <div class="template-preview-badges">
+                        <span class="template-type-badge">${template.type}</span>
+                        <span class="template-stat-badge">
+                            <i class="fas fa-clock"></i> ${template.estimatedTime || '5 min'}
+                        </span>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="app.closeTemplatePreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-section">
+                    <h3>What's included:</h3>
+                    <div class="preview-stats">
+                        <div class="preview-stat">
+                            <i class="fas fa-layer-group"></i>
+                            <span>${template.sections || 3} sections</span>
+                        </div>
+                        <div class="preview-stat">
+                            <i class="fas fa-question"></i>
+                            <span>${template.questions || 8} questions</span>
+                        </div>
+                        <div class="preview-stat">
+                            <i class="fas fa-users"></i>
+                            <span>For all team members</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-form-sample">
+                    <h4>Sample questions:</h4>
+                    <div class="sample-questions">
+                        <div class="sample-question">How would you rate today's performance?</div>
+                        <div class="sample-question">What areas need improvement?</div>
+                        <div class="sample-question">Team communication effectiveness?</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.closeTemplatePreview()">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" onclick="app.useTemplate()">
+                    <i class="fas fa-rocket"></i> Use This Template
+                </button>
+            </div>
+        `;
+        
+        modalOverlay.appendChild(modal);
+        document.body.appendChild(modalOverlay);
+        
+        // Add animation
+        setTimeout(() => {
+            modalOverlay.classList.add('active');
+        }, 10);
+    }
+    
+    closeTemplatePreview() {
+        const modalOverlay = document.querySelector('.modal-overlay');
+        if (modalOverlay) {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => {
+                document.body.removeChild(modalOverlay);
+            }, 300);
+        }
+    }
+    
+    useTemplate() {
+        this.closeTemplatePreview();
         this.createFormFromTemplate();
     }
     
