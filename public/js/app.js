@@ -184,6 +184,10 @@ class GAA_FeedbackApp {
     }
     
     renderTemplateGallery() {
+        // Render recent templates (last 3 used by the club)
+        this.renderRecentTemplates();
+        
+        // Render all templates
         const templateGrid = document.getElementById('template-grid');
         if (!templateGrid || !this.templates) return;
         
@@ -192,6 +196,49 @@ class GAA_FeedbackApp {
         this.templates.forEach(template => {
             const templateCard = this.createTemplateCard(template);
             templateGrid.appendChild(templateCard);
+        });
+    }
+    
+    renderRecentTemplates() {
+        const recentGrid = document.getElementById('recent-templates-grid');
+        if (!recentGrid) return;
+        
+        // Mock recent templates data (in real app, this would come from server)
+        const recentTemplates = [
+            {
+                name: 'Post-Match Review',
+                description: 'Quick feedback after the last championship match',
+                type: 'match',
+                sections: 4,
+                questions: 12,
+                estimatedTime: '6 min',
+                lastUsed: '2 days ago'
+            },
+            {
+                name: 'Training Session Evaluation',
+                description: 'Weekly training performance assessment',
+                type: 'training',
+                sections: 3,
+                questions: 8,
+                estimatedTime: '4 min',
+                lastUsed: '5 days ago'
+            },
+            {
+                name: 'Team Spirit Check',
+                description: 'Monthly team morale and cohesion survey',
+                type: 'team',
+                sections: 2,
+                questions: 6,
+                estimatedTime: '3 min',
+                lastUsed: '1 week ago'
+            }
+        ];
+        
+        recentGrid.innerHTML = '';
+        
+        recentTemplates.forEach(template => {
+            const templateCard = this.createTemplateCard(template);
+            recentGrid.appendChild(templateCard);
         });
     }
     

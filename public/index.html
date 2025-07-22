@@ -41,29 +41,38 @@
                     <!-- Coach - No Form Created (Typeform Style) -->
                     <div id="coach-no-form" class="screen">
                         <div class="typeform-container">
-                            <!-- Header Section -->
-                            <div class="typeform-header">
-                                <h1 class="typeform-title">Create your GAA feedback form</h1>
-                                <p class="typeform-subtitle">Choose a template below or start from scratch</p>
-                            </div>
-                            
                             <!-- Template Gallery -->
                             <div class="template-gallery">
-                                <div class="template-grid" id="template-grid">
-                                    <!-- Templates will be loaded here -->
+                                <!-- Recent Templates Section -->
+                                <div class="template-section">
+                                    <div class="section-header">
+                                        <h2>Recent Templates</h2>
+                                    </div>
+                                    <div class="template-grid" id="recent-templates-grid">
+                                        <!-- Recent templates will be loaded here -->
+                                    </div>
                                 </div>
                                 
-                                <!-- Create from Scratch Option -->
-                                <div class="create-scratch-card" onclick="showFormBuilder()">
-                                    <div class="scratch-card-content">
-                                        <div class="scratch-icon">
-                                            <i class="fas fa-magic"></i>
+                                <!-- All Templates Section -->
+                                <div class="template-section">
+                                    <div class="section-header">
+                                        <h2>All Templates</h2>
+                                    </div>
+                                    <div class="template-grid" id="template-grid">
+                                        <!-- Templates will be loaded here -->
+                                        
+                                        <!-- Create from Scratch Option -->
+                                        <div class="create-scratch-card" onclick="showFormBuilder()">
+                                            <div class="scratch-card-content">
+                                                <div class="scratch-icon">
+                                                    <i class="fas fa-magic"></i>
+                                                </div>
+                                                <div class="scratch-text-content">
+                                                    <h3>Start from scratch</h3>
+                                                    <p>Build your form from the ground up</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="scratch-text-content">
-                                            <h3>Start from scratch</h3>
-                                            <p>Build your form from the ground up</p>
-                                        </div>
-                                        <div class="scratch-badge">Custom</div>
                                     </div>
                                 </div>
                             </div>
