@@ -5002,10 +5002,9 @@ body {
     position: relative;
     overflow: hidden;
     border-radius: 24px;
-    margin: 20px auto;
-    width: fit-content;
-    min-width: 800px;
-    max-width: 1200px;
+    margin: 20px 12px;
+    width: calc(100% - 24px);
+    max-width: none;
 }
 
 /* Add subtle pattern overlay */
@@ -5288,10 +5287,8 @@ body {
 @media (max-width: 768px) {
     .typeform-container {
         padding: 20px 16px;
-        margin: 10px auto;
-        min-width: auto;
-        width: calc(100% - 20px);
-        max-width: none;
+        margin: 10px 12px;
+        width: calc(100% - 24px);
         border-radius: 20px;
     }
     
