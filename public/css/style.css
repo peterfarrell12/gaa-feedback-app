@@ -29,32 +29,24 @@ body {
     -moz-osx-font-smoothing: grayscale;
     /* Prevent horizontal overflow */
     overflow-x: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
 }
 
 .container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
 }
 
 /* Mobile-first responsive container */
 @media (min-width: 640px) {
     .container {
-        padding: 0;
+        padding: 0 20px;
     }
 }
 
 @media (min-width: 1024px) {
     .container {
-        padding: 0;
+        padding: 0 24px;
     }
 }
 
@@ -239,23 +231,18 @@ body {
 
 /* Main Content - Mobile First */
 .main {
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: 100vh;
+    padding: 16px 0;
 }
 
 @media (min-width: 640px) {
     .main {
-        padding: 0;
+        padding: 20px 0;
     }
 }
 
 @media (min-width: 1024px) {
     .main {
-        padding: 0;
+        padding: 24px 0;
     }
 }
 
@@ -5015,7 +5002,7 @@ body {
     position: relative;
     overflow: hidden;
     border-radius: 24px;
-    margin: 0;
+    margin: 20px auto;
     width: fit-content;
     min-width: 800px;
     max-width: 1200px;
@@ -5077,14 +5064,19 @@ body {
 
 .section-header {
     margin-bottom: 20px;
+    background: transparent;
 }
 
-.section-header h2 {
+.typeform-container .section-header h2 {
     font-size: 20px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.9) !important;
     margin: 0;
     text-align: left;
+    background: transparent !important;
+    padding: 0;
+    border: none;
+    box-shadow: none;
 }
 
 .template-grid {
@@ -5294,16 +5286,11 @@ body {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-    body {
-        min-height: auto;
-        padding: 10px;
-    }
-    
     .typeform-container {
         padding: 20px 16px;
-        margin: 0;
+        margin: 10px auto;
         min-width: auto;
-        width: 100%;
+        width: calc(100% - 20px);
         max-width: none;
         border-radius: 20px;
     }
