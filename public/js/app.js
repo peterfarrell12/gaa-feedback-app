@@ -236,19 +236,37 @@ class GAA_FeedbackApp {
     }
     
     renderTemplateGallery() {
+        console.log('Rendering template gallery...');
+        
         // Render recent templates (last 3 used by the club)
         this.renderRecentTemplates();
         
         // Render all templates
         const templateGrid = document.getElementById('template-grid');
-        if (!templateGrid || !this.templates) return;
+        if (!templateGrid) {
+            console.error('Template grid element not found');
+            return;
+        }
+        
+        if (!this.templates || this.templates.length === 0) {
+            console.warn('No templates available');
+            return;
+        }
         
         templateGrid.innerHTML = '';
+        console.log('Adding', this.templates.length, 'templates to grid');
         
-        this.templates.forEach(template => {
+        this.templates.forEach((template, index) => {
+            console.log('Creating card for template', index + 1, ':', template.name);
             const templateCard = this.createTemplateCard(template);
+            templateCard.addEventListener('click', () => {
+                console.log('Template card clicked:', template.name);
+                this.selectTemplate(template);
+            });
             templateGrid.appendChild(templateCard);
         });
+        
+        console.log('Template gallery rendered successfully');
     }
     
     renderRecentTemplates() {
@@ -295,9 +313,18 @@ class GAA_FeedbackApp {
     }
     
     createTemplateCard(template) {
+        console.log('Creating template card for:', template.name);
         const card = document.createElement('div');
         card.className = 'template-card';
-        card.onclick = () => this.selectTemplate(template);
+        card.style.cursor = 'pointer';
+        
+        // Remove any existing onclick and use addEventListener instead
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Template card direct click handler triggered for:', template.name);
+            this.selectTemplate(template);
+        });
         
         // Determine template icon based on type
         let iconClass = 'fas fa-clipboard-list';
@@ -338,11 +365,16 @@ class GAA_FeedbackApp {
     }
     
     selectTemplate(template) {
-        console.log('Selected template:', template);
+        console.log('selectTemplate called with:', template);
+        console.log('Template name:', template?.name);
         this.selectedTemplate = template;
         
-        // Show template preview popup
-        this.showTemplatePreview(template);
+        try {
+            // Show template preview popup
+            this.showTemplatePreview(template);
+        } catch (error) {
+            console.error('Error showing template preview:', error);
+        }
     }
     
     showTemplatePreview(template) {
@@ -896,6 +928,15 @@ class GAA_FeedbackApp {
     async submitPlayerResponse() {
         if (!this.currentForm || !this.formState) {
             console.error('Missing form or form state');
+            console.error('currentForm:', this.currentForm);
+            console.error('formState:', this.formState);
+            this.showNotification('Form not properly loaded. Please refresh the page.', 'error');
+            return;
+        }
+        
+        if (!this.currentForm.id) {
+            console.error('Form ID is missing');
+            this.showNotification('Form ID is missing. Cannot submit response.', 'error');
             return;
         }
         
@@ -908,7 +949,7 @@ class GAA_FeedbackApp {
         }
         
         console.log('Submitting response with:', {
-            formId: this.currentForm.id,
+            formId: this.currentForm?.id || 'NO_FORM_ID',
             userId: this.currentUserId,
             responses: this.formState.responses,
             completionTime: completionTime
