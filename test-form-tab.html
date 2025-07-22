@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Tab Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .info { background: #e3f2fd; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .success { background: #e8f5e8; padding: 15px; border-radius: 4px; margin: 10px 0; color: #2e7d32; }
+        .error { background: #ffebee; padding: 15px; border-radius: 4px; margin: 10px 0; color: #c62828; }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .btn:hover { background: #0056b3; }
+        iframe { width: 100%; height: 500px; border: 1px solid #ddd; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Form Tab Test</h1>
+    
+    <div class="info">
+        <strong>Steps to Test:</strong>
+        <ol>
+            <li>Open the link below in a new tab</li>
+            <li>Press <strong>Ctrl+Shift+R</strong> (or <strong>Cmd+Shift+R</strong> on Mac) to force refresh</li>
+            <li>Check the console for the message: "🔧 New loadFormView function available"</li>
+            <li>Create a form using "Post-Match Standard Review" template</li>
+            <li>Click the "Form" tab</li>
+            <li>Check if it shows the form structure or still says "coming soon"</li>
+        </ol>
+    </div>
+    
+    <div class="success">
+        <strong>Test URL:</strong><br>
+        <a href="http://localhost:3009/?event-id=form-tab-test" target="_blank">http://localhost:3009/?event-id=form-tab-test</a>
+    </div>
+    
+    <div class="error">
+        <strong>Important:</strong> If you still see "Form structure view coming soon", it means the browser is using cached JavaScript. Try:
+        <ul>
+            <li>Hard refresh: <strong>Ctrl+Shift+R</strong> (Windows) or <strong>Cmd+Shift+R</strong> (Mac)</li>
+            <li>Clear browser cache for localhost:3009</li>
+            <li>Open in incognito/private window</li>
+        </ul>
+    </div>
+    
+    <button class="btn" onclick="testAPI()">Test API Connection</button>
+    <button class="btn" onclick="openTestPage()">Open Test Page</button>
+    
+    <div id="test-results"></div>
+    
+    <script>
+        function testAPI() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<p>Testing API...</p>';
+            
+            fetch('http://localhost:3009/api/templates')
+                .then(r => r.json())
+                .then(data => {
+                    results.innerHTML = `<div class="success">✅ API Working: ${data.length} templates found</div>`;
+                })
+                .catch(err => {
+                    results.innerHTML = `<div class="error">❌ API Error: ${err.message}</div>`;
+                });
+        }
+        
+        function openTestPage() {
+            window.open('http://localhost:3009/?event-id=form-tab-test', '_blank');
+        }
+    </script>
+</body>
+</html>

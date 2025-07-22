@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .hidden { display: none !important; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .interface { min-height: 200px; border: 2px solid #ccc; padding: 20px; }
+        .interface.hidden { display: none; }
+        .empty-state { text-align: center; padding: 40px; }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .debug { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Interface Test</h1>
+    <div id="debug-output" class="debug"></div>
+    
+    <button onclick="testCoachInterface()">Test Coach Interface</button>
+    <button onclick="testPlayerInterface()">Test Player Interface</button>
+    <button onclick="testSwitchUserType()">Switch User Type</button>
+    
+    <hr>
+    
+    <!-- Coach Interface -->
+    <div id="coach-interface" class="interface hidden">
+        <h2>Coach Interface</h2>
+        <div id="coach-no-form" class="screen">
+            <div class="empty-state">
+                <h3>No Form Created</h3>
+                <p>Create a feedback form for this event to start collecting responses.</p>
+                <button class="btn" onclick="debug('Form builder clicked')">Create Form</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Interface -->
+    <div id="player-interface" class="interface hidden">
+        <h2>Player Interface</h2>
+        <div id="player-no-form" class="screen">
+            <div class="empty-state">
+                <h3>No Form Available</h3>
+                <p>There is no active feedback form for this event yet.</p>
+                <p>Event: <span id="event-name-player">test-event</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentUserType = 'coach';
+        
+        function debug(msg) {
+            const output = document.getElementById('debug-output');
+            output.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+        }
+        
+        function hideAllScreens() {
+            document.querySelectorAll('.interface').forEach(el => el.classList.add('hidden'));
+            debug('All screens hidden');
+        }
+        
+        function hideAllCoachScreens() {
+            document.querySelectorAll('#coach-interface .screen').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('active');
+            });
+            debug('All coach screens hidden');
+        }
+        
+        function showCoachNoForm() {
+            hideAllCoachScreens();
+            const element = document.getElementById('coach-no-form');
+            element.classList.remove('hidden');
+            element.classList.add('active');
+            debug('Coach no form screen shown');
+        }
+        
+        function showCoachInterface() {
+            debug('Setting up coach interface');
+            hideAllScreens();
+            document.getElementById('coach-interface').classList.remove('hidden');
+            showCoachNoForm();
+            debug('Coach interface shown');
+        }
+        
+        function showPlayerInterface() {
+            debug('Setting up player interface');
+            hideAllScreens();
+            document.getElementById('player-interface').classList.remove('hidden');
+            const element = document.getElementById('player-no-form');
+            element.classList.remove('hidden');
+            element.classList.add('active');
+            debug('Player interface shown');
+        }
+        
+        function testCoachInterface() {
+            currentUserType = 'coach';
+            showCoachInterface();
+        }
+        
+        function testPlayerInterface() {
+            currentUserType = 'player';
+            showPlayerInterface();
+        }
+        
+        function testSwitchUserType() {
+            currentUserType = currentUserType === 'coach' ? 'player' : 'coach';
+            debug(`Switching to ${currentUserType}`);
+            if (currentUserType === 'coach') {
+                showCoachInterface();
+            } else {
+                showPlayerInterface();
+            }
+        }
+        
+        // Auto-start with coach interface
+        debug('Page loaded');
+        testCoachInterface();
+    </script>
+</body>
+</html>

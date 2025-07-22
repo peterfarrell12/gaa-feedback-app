@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Builder Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        iframe {
+            width: 100%;
+            height: 800px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        .instructions {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+        }
+        .instructions ol {
+            margin-bottom: 0;
+        }
+        .buttons {
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            background: #28a745;
+        }
+        .success:hover {
+            background: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>GAA Feedback System - Form Builder Test</h1>
+        
+        <div class="instructions">
+            <h3>Coach Workflow Test Instructions:</h3>
+            <ol>
+                <li>Open the application in the iframe below</li>
+                <li>You should see "No Form Created" message</li>
+                <li>Click "Create Form" button</li>
+                <li>You should see the Form Builder with template selection</li>
+                <li>Select a template (click on one of the cards)</li>
+                <li>The "Create Form" button should become enabled</li>
+                <li>Click "Create Form" to create the form</li>
+                <li>You should see the form area with tabs (Analysis, Responses, Form)</li>
+                <li>Test switching between tabs</li>
+                <li>Use the "Switch User Type" button to test player view</li>
+            </ol>
+        </div>
+        
+        <div class="buttons">
+            <button onclick="loadApplication()">Load Application</button>
+            <button onclick="testAPIEndpoints()">Test API Endpoints</button>
+            <button class="success" onclick="window.open('http://localhost:3009/?event-id=test-event', '_blank')">Open in New Window</button>
+        </div>
+        
+        <div id="api-results"></div>
+        
+        <div id="iframe-container">
+            <iframe id="app-iframe" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function loadApplication() {
+            document.getElementById('app-iframe').src = 'http://localhost:3009/?event-id=test-event';
+        }
+        
+        async function testAPIEndpoints() {
+            const resultsDiv = document.getElementById('api-results');
+            resultsDiv.innerHTML = '<div style="background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 10px;">Testing API endpoints...</div>';
+            
+            const tests = [
+                {
+                    name: 'Templates API',
+                    url: 'http://localhost:3009/api/templates',
+                    description: 'Should return array of 3 templates'
+                },
+                {
+                    name: 'Forms API',
+                    url: 'http://localhost:3009/api/forms?event_id=test-event',
+                    description: 'Should return empty array (no forms created yet)'
+                }
+            ];
+            
+            let resultsHTML = '';
+            
+            for (const test of tests) {
+                try {
+                    const response = await fetch(test.url);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        const count = Array.isArray(data) ? data.length : 'N/A';
+                        resultsHTML += `
+                            <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                <strong>✅ ${test.name}</strong><br>
+                                ${test.description}<br>
+                                <small>Result: ${Array.isArray(data) ? `Array with ${count} items` : typeof data}</small>
+                            </div>
+                        `;
+                    } else {
+                        resultsHTML += `
+                            <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                <strong>❌ ${test.name}</strong><br>
+                                Error: ${data.error || 'Unknown error'}
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    resultsHTML += `
+                        <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                            <strong>❌ ${test.name}</strong><br>
+                            Network Error: ${error.message}
+                        </div>
+                    `;
+                }
+            }
+            
+            resultsDiv.innerHTML = resultsHTML;
+        }
+        
+        // Auto-load the application
+        window.addEventListener('load', () => {
+            loadApplication();
+        });
+    </script>
+</body>
+</html>

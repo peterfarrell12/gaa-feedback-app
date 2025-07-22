@@ -1,0 +1,61 @@
+[dotenv@17.2.0] injecting env (3) from .env.local (tip: ⚙️  write to custom object with { processEnv: myObject })
+🏈 TeamSync Feedback Dev Tool (Supabase) running on http://localhost:3009
+📊 Dashboard: http://localhost:3009
+🔧 API: http://localhost:3009/api
+🗄️ Database: https://kgwqhrcghudosbdphlom.supabase.co
+Fetching templates from Supabase...
+Found 3 templates
+Processing template: Test
+Found 0 sections for template Test
+Processing template: Post-Match Standard Review
+Found 3 sections for template Post-Match Standard Review
+Found 4 questions for section Performance Assessment
+Found 3 questions for section Tactical Analysis
+Found 5 questions for section Team Dynamics
+Processing template: Training Session Review
+Found 2 sections for template Training Session Review
+Found 4 questions for section Session Quality
+Found 4 questions for section Training Environment
+Returning 3 transformed templates
+Fetching templates from Supabase...
+Found 3 templates
+Processing template: Test
+Found 0 sections for template Test
+Processing template: Post-Match Standard Review
+Found 3 sections for template Post-Match Standard Review
+Found 4 questions for section Performance Assessment
+Found 3 questions for section Tactical Analysis
+Found 5 questions for section Team Dynamics
+Processing template: Training Session Review
+Found 2 sections for template Training Session Review
+Found 4 questions for section Session Quality
+Found 4 questions for section Training Environment
+Returning 3 transformed templates
+Fetching templates from Supabase...
+Found 3 templates
+Processing template: Test
+Found 0 sections for template Test
+Processing template: Post-Match Standard Review
+Found 3 sections for template Post-Match Standard Review
+Found 4 questions for section Performance Assessment
+Found 3 questions for section Tactical Analysis
+Found 5 questions for section Team Dynamics
+Processing template: Training Session Review
+Found 2 sections for template Training Session Review
+Found 4 questions for section Session Quality
+Found 4 questions for section Training Environment
+Returning 3 transformed templates
+Fetching templates from Supabase...
+Found 3 templates
+Processing template: Test
+Found 0 sections for template Test
+Processing template: Post-Match Standard Review
+Found 3 sections for template Post-Match Standard Review
+Found 4 questions for section Performance Assessment
+Found 3 questions for section Tactical Analysis
+Found 5 questions for section Team Dynamics
+Processing template: Training Session Review
+Found 2 sections for template Training Session Review
+Found 4 questions for section Session Quality
+Found 4 questions for section Training Environment
+Returning 3 transformed templates

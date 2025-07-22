@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Page</title>
+    <link href="http://localhost:3009/css/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .debug-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            border-left: 1px solid #ddd;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        .debug-log {
+            margin: 2px 0;
+            padding: 2px;
+            background: #f0f0f0;
+            border-radius: 2px;
+        }
+        .debug-error { background: #ffebee; color: #c62828; }
+        .debug-success { background: #e8f5e8; color: #2e7d32; }
+        .debug-info { background: #e3f2fd; color: #1565c0; }
+        body { margin-right: 300px; }
+    </style>
+</head>
+<body>
+    <div class="debug-panel">
+        <h3>Debug Console</h3>
+        <div id="debug-logs"></div>
+    </div>
+    
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-football-ball"></i>
+                        <h1>GAA Feedback System</h1>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="switchUserType()">
+                            <i class="fas fa-user-friends"></i> Switch User Type
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                
+                <!-- Loading Screen -->
+                <div id="loading-screen" class="loading-screen">
+                    <div class="loading-content">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <h2>Loading...</h2>
+                        <p>Getting event details...</p>
+                    </div>
+                </div>
+
+                <!-- Error Screen -->
+                <div id="error-screen" class="error-screen hidden">
+                    <div class="error-content">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>Error</h2>
+                        <p id="error-message">Something went wrong</p>
+                        <button class="btn btn-primary" onclick="location.reload()">
+                            <i class="fas fa-refresh"></i> Retry
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coach Interface -->
+                <div id="coach-interface" class="interface hidden">
+                    <!-- Coach - No Form Created -->
+                    <div id="coach-no-form" class="screen">
+                        <div class="screen-content">
+                            <div class="empty-state">
+                                <i class="fas fa-plus-circle"></i>
+                                <h2>No Form Created</h2>
+                                <p>Create a feedback form for this event to start collecting responses.</p>
+                                <button class="btn btn-primary" onclick="showFormBuilder()">
+                                    <i class="fas fa-plus"></i> Create Form
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Interface -->
+                <div id="player-interface" class="interface hidden">
+                    <!-- Player - No Form Available -->
+                    <div id="player-no-form" class="screen">
+                        <div class="screen-content">
+                            <div class="empty-state">
+                                <i class="fas fa-clipboard-question"></i>
+                                <h2>No Form Available</h2>
+                                <p>There is no active feedback form for this event yet.</p>
+                                <p class="event-info">Event: <span id="event-name-player"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const debugLogs = document.getElementById('debug-logs');
+        
+        function debugLog(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `debug-log debug-${type}`;
+            div.textContent = `${new Date().toLocaleTimeString()}: ${msg}`;
+            debugLogs.appendChild(div);
+            debugLogs.scrollTop = debugLogs.scrollHeight;
+        }
+        
+        // Override console
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            debugLog(args.join(' '), 'info');
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            debugLog(args.join(' '), 'error');
+            originalError.apply(console, args);
+        };
+        
+        debugLog('Debug page loaded', 'success');
+    </script>
+    <script src="debug-app.js"></script>
+</body>
+</html>

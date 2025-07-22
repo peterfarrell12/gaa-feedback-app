@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAA Feedback System</title>
+    <link href="css/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-football-ball"></i>
+                        <h1>GAA Feedback System</h1>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" onclick="switchUserType()">
+                            <i class="fas fa-user-friends"></i> Switch User Type
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                
+                <!-- Loading Screen -->
+                <div id="loading-screen" class="loading-screen">
+                    <div class="loading-content">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <h2>Loading...</h2>
+                        <p>Getting event details...</p>
+                    </div>
+                </div>
+
+                <!-- Error Screen -->
+                <div id="error-screen" class="error-screen hidden">
+                    <div class="error-content">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>Error</h2>
+                        <p id="error-message">Something went wrong</p>
+                        <button class="btn btn-primary" onclick="location.reload()">
+                            <i class="fas fa-refresh"></i> Retry
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Coach Interface -->
+                <div id="coach-interface" class="interface hidden">
+                    <!-- Coach - No Form Created -->
+                    <div id="coach-no-form" class="screen">
+                        <div class="screen-content">
+                            <div class="empty-state">
+                                <i class="fas fa-plus-circle"></i>
+                                <h2>No Form Created</h2>
+                                <p>Create a feedback form for this event to start collecting responses.</p>
+                                <button class="btn btn-primary" onclick="showFormBuilder()">
+                                    <i class="fas fa-plus"></i> Create Form
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coach - Form Builder -->
+                    <div id="coach-form-builder" class="screen hidden">
+                        <div class="form-builder-header">
+                            <div class="builder-title">
+                                <h2><i class="fas fa-tools"></i> Form Builder</h2>
+                                <p>Building form for: <span id="event-name-builder"></span></p>
+                            </div>
+                            <div class="builder-actions">
+                                <button class="btn btn-secondary" onclick="cancelFormBuilder()">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button class="btn btn-outline" onclick="previewForm()">
+                                    <i class="fas fa-eye"></i> Preview
+                                </button>
+                                <button class="btn btn-primary" onclick="saveForm()" id="save-form-btn">
+                                    <i class="fas fa-save"></i> Save Form
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-builder-content">
+                            <!-- Left Panel: Question Bank -->
+                            <div class="form-builder-panel question-bank-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-question-circle"></i> Question Bank</h3>
+                                    <input type="text" placeholder="Search questions..." class="search-input" id="question-search">
+                                </div>
+                                <div class="panel-content">
+                                    <div class="question-categories">
+                                        <div class="question-category" data-category="custom">
+                                            <h4><i class="fas fa-user-edit"></i> Custom Questions</h4>
+                                            <div class="question-bank-items" id="custom-questions">
+                                                <!-- Custom questions will be loaded here -->
+                                            </div>
+                                        </div>
+                                        <div class="question-category active" data-category="performance">
+                                            <h4><i class="fas fa-star"></i> Performance</h4>
+                                            <div class="question-bank-items" id="performance-questions">
+                                                <!-- Performance questions will be loaded here -->
+                                            </div>
+                                        </div>
+                                        <div class="question-category" data-category="team">
+                                            <h4><i class="fas fa-users"></i> Team/Tactics</h4>
+                                            <div class="question-bank-items" id="team-questions">
+                                                <!-- Team questions will be loaded here -->
+                                            </div>
+                                        </div>
+                                        <div class="question-category" data-category="training">
+                                            <h4><i class="fas fa-dumbbell"></i> Training</h4>
+                                            <div class="question-bank-items" id="training-questions">
+                                                <!-- Training questions will be loaded here -->
+                                            </div>
+                                        </div>
+                                        <div class="question-category" data-category="management">
+                                            <h4><i class="fas fa-clipboard-list"></i> Management</h4>
+                                            <div class="question-bank-items" id="management-questions">
+                                                <!-- Management questions will be loaded here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Center Panel: Form Structure -->
+                            <div class="form-builder-panel form-structure-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-list"></i> Form Structure</h3>
+                                    <button class="btn btn-sm btn-primary" onclick="addSection()">
+                                        <i class="fas fa-plus"></i> Add Section
+                                    </button>
+                                </div>
+                                <div class="panel-content">
+                                    <div id="form-structure-content" class="form-structure-builder">
+                                        <!-- Form sections will be built here -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Panel: Question Editor -->
+                            <div class="form-builder-panel question-editor-panel">
+                                <div class="panel-header">
+                                    <h3><i class="fas fa-edit"></i> Question Editor</h3>
+                                    <button class="btn btn-sm btn-success" onclick="createCustomQuestion()">
+                                        <i class="fas fa-plus"></i> New Question
+                                    </button>
+                                </div>
+                                <div class="panel-content">
+                                    <div id="question-editor-content" class="question-editor">
+                                        <div class="editor-placeholder">
+                                            <i class="fas fa-mouse-pointer"></i>
+                                            <h4>Select a question to edit</h4>
+                                            <p>Click on a question from the bank or form structure to start editing</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coach - Form Preview -->
+                    <div id="coach-form-preview" class="screen hidden">
+                        <div class="screen-header">
+                            <h2><i class="fas fa-eye"></i> Form Preview</h2>
+                            <p>Review your form before publishing</p>
+                        </div>
+                        
+                        <div id="form-preview-content">
+                            <!-- Form preview will be shown here -->
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="btn btn-secondary" onclick="editForm()">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-primary" onclick="publishForm()">
+                                <i class="fas fa-rocket"></i> Publish Form
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Coach - Form Area (with tabs) -->
+                    <div id="coach-form-area" class="screen hidden">
+                        <div class="screen-header">
+                            <h2 id="form-title">Form Title</h2>
+                            <p>Event: <span id="event-name-area"></span></p>
+                        </div>
+
+                        <!-- Navigation Tabs -->
+                        <div class="tabs">
+                            <button class="tab-button active" onclick="showTab('analysis')">
+                                <i class="fas fa-chart-bar"></i> Analysis
+                            </button>
+                            <button class="tab-button" onclick="showTab('responses')">
+                                <i class="fas fa-comments"></i> Responses
+                            </button>
+                            <button class="tab-button" onclick="showTab('form')">
+                                <i class="fas fa-edit"></i> Form
+                            </button>
+                        </div>
+
+                        <!-- Tab Content -->
+                        <div class="tab-content">
+                            <!-- Analysis Tab -->
+                            <div id="analysis-tab" class="tab-pane active">
+                                <div class="analytics-dashboard">
+                                    <!-- Key Metrics Cards -->
+                                    <div class="analytics-cards">
+                                        <div class="analytics-card">
+                                            <div class="card-header">
+                                                <h3>Response Rate</h3>
+                                                <i class="fas fa-chart-line"></i>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="metric">
+                                                    <span class="metric-value" id="response-rate">0%</span>
+                                                    <span class="metric-label">of players responded</span>
+                                                </div>
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" id="response-rate-progress"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="analytics-card">
+                                            <div class="card-header">
+                                                <h3>Total Responses</h3>
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="metric">
+                                                    <span class="metric-value" id="total-responses">0</span>
+                                                    <span class="metric-label">responses collected</span>
+                                                </div>
+                                                <div class="completion-indicator">
+                                                    <span class="player-count" id="player-count">0 players</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="analytics-card">
+                                            <div class="card-header">
+                                                <h3>Avg. Completion Time</h3>
+                                                <i class="fas fa-clock"></i>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="metric">
+                                                    <span class="metric-value" id="avg-completion-time">--</span>
+                                                    <span class="metric-label">minutes</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="analytics-card">
+                                            <div class="card-header">
+                                                <h3>Engagement Score</h3>
+                                                <i class="fas fa-fire"></i>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="metric">
+                                                    <span class="metric-value" id="engagement-score">--</span>
+                                                    <span class="metric-label">out of 100</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Charts Section -->
+                                    <div class="analytics-charts">
+                                        <div class="chart-grid">
+                                            <div class="chart-card">
+                                                <div class="chart-header">
+                                                    <h3><i class="fas fa-chart-pie"></i> Response Distribution</h3>
+                                                </div>
+                                                <div class="chart-container">
+                                                    <canvas id="responseDistributionChart"></canvas>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="chart-card">
+                                                <div class="chart-header">
+                                                    <h3><i class="fas fa-chart-bar"></i> Rating Analysis</h3>
+                                                </div>
+                                                <div class="chart-container">
+                                                    <canvas id="ratingAnalysisChart"></canvas>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="chart-card">
+                                                <div class="chart-header">
+                                                    <h3><i class="fas fa-chart-line"></i> Completion Times</h3>
+                                                </div>
+                                                <div class="chart-container">
+                                                    <canvas id="completionTimeChart"></canvas>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="chart-card">
+                                                <div class="chart-header">
+                                                    <h3><i class="fas fa-list-alt"></i> Key Insights</h3>
+                                                </div>
+                                                <div class="insights-content" id="analytics-insights">
+                                                    <p class="no-data">No insights available yet.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Responses Tab -->
+                            <div id="responses-tab" class="tab-pane">
+                                <div class="responses-dashboard">
+                                    <div class="responses-header">
+                                        <h3><i class="fas fa-comments"></i> Response Analysis</h3>
+                                        <div class="view-toggle">
+                                            <button class="toggle-btn active" id="by-player-btn" onclick="switchResponseView('player')">
+                                                <i class="fas fa-user"></i> By Player
+                                            </button>
+                                            <button class="toggle-btn" id="by-question-btn" onclick="switchResponseView('question')">
+                                                <i class="fas fa-question"></i> By Question
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- By Player View -->
+                                    <div id="responses-by-player" class="responses-view active">
+                                        <div class="responses-grid" id="player-responses-grid">
+                                            <p class="no-data">No responses received yet.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- By Question View -->
+                                    <div id="responses-by-question" class="responses-view">
+                                        <div class="questions-analysis" id="questions-analysis-content">
+                                            <p class="no-data">No responses received yet.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Tab -->
+                            <div id="form-tab" class="tab-pane">
+                                <div class="form-display">
+                                    <div id="form-content">
+                                        <!-- Form structure will be displayed here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Interface -->
+                <div id="player-interface" class="interface hidden">
+                    <!-- Player - No Form Available -->
+                    <div id="player-no-form" class="screen">
+                        <div class="screen-content">
+                            <div class="empty-state">
+                                <i class="fas fa-clipboard-question"></i>
+                                <h2>No Form Available</h2>
+                                <p>There is no active feedback form for this event yet.</p>
+                                <p class="event-info">Event: <span id="event-name-player"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Player - Form Viewer & Filler -->
+                    <div id="player-form-viewer" class="screen hidden">
+                        <div class="player-form-wrapper">
+                            <!-- Form Header -->
+                            <div class="player-form-header">
+                                <div class="form-info">
+                                    <h2 id="player-form-title">Form Title</h2>
+                                    <p class="form-subtitle">Event: <span id="event-name-form"></span></p>
+                                    <div class="form-meta">
+                                        <span class="estimated-time" id="estimated-time">
+                                            <i class="fas fa-clock"></i> ~5 minutes
+                                        </span>
+                                        <span class="player-badge" id="player-badge">
+                                            <i class="fas fa-user"></i> Player ID: <span id="player-id-display"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                                <div class="progress-container">
+                                    <div class="progress-info">
+                                        <span class="progress-text">Section <span id="current-section">1</span> of <span id="total-sections">3</span></span>
+                                        <span class="progress-percentage" id="progress-percentage">0%</span>
+                                    </div>
+                                    <div class="progress-track">
+                                        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Form Content -->
+                            <div class="player-form-container">
+                                <div class="form-sections" id="form-sections">
+                                    <!-- Sections will be rendered here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Form Navigation -->
+                            <div class="form-navigation">
+                                <button class="btn btn-secondary nav-btn" id="prev-btn" onclick="navigateForm('prev')" disabled>
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </button>
+                                
+                                <div class="section-indicators" id="section-indicators">
+                                    <!-- Section dots will be rendered here -->
+                                </div>
+                                
+                                <button class="btn btn-primary nav-btn" id="next-btn" onclick="navigateForm('next')">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Player - Response Submitted -->
+                    <div id="player-response-submitted" class="screen hidden">
+                        <div class="screen-content">
+                            <div class="success-state">
+                                <i class="fas fa-check-circle"></i>
+                                <h2>Response Submitted!</h2>
+                                <p>Thank you for your feedback. Your response has been recorded.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js?v=1752828500"></script>
+</body>
+</html>

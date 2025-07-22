@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Test - GAA Feedback</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-link { display: block; margin: 10px 0; padding: 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; text-align: center; }
+        .test-link:hover { background: #0056b3; }
+        .info { background: #e7f3ff; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .error { background: #ffebee; padding: 15px; border-radius: 4px; margin: 10px 0; color: #c62828; }
+        .success { background: #e8f5e8; padding: 15px; border-radius: 4px; margin: 10px 0; color: #2e7d32; }
+        iframe { width: 100%; height: 600px; border: 1px solid #ddd; margin: 20px 0; border-radius: 4px; }
+        code { background: #f8f9fa; padding: 2px 4px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GAA Feedback System - Working Test</h1>
+        
+        <div class="info">
+            <strong>Important:</strong> The system requires an <code>event-id</code> parameter in the URL to work properly.
+        </div>
+        
+        <h2>✅ Working Test URLs:</h2>
+        <a href="http://localhost:3009/?event-id=coach-test" class="test-link" target="_blank">
+            🏈 Coach View - Test Event "coach-test"
+        </a>
+        
+        <a href="http://localhost:3009/?event-id=player-test" class="test-link" target="_blank">
+            👤 Player View - Test Event "player-test"
+        </a>
+        
+        <h2>🔄 Step-by-Step Test Process:</h2>
+        <div class="info">
+            <ol>
+                <li>Click the <strong>Coach View</strong> link above</li>
+                <li>You should see "No Form Created" message</li>
+                <li>Click <strong>"Create Form"</strong> button</li>
+                <li>Select <strong>"Post-Match Standard Review"</strong> template</li>
+                <li>Click <strong>"Create Form"</strong> button</li>
+                <li>Form should be created and you'll see the analytics tabs</li>
+                <li>Click <strong>"Switch User Type"</strong> to test player view</li>
+                <li>Fill out the form and submit</li>
+                <li>Switch back to coach view to see analytics</li>
+            </ol>
+        </div>
+        
+        <h2>🚨 Common Issues:</h2>
+        <div class="error">
+            <strong>Problem:</strong> Page loads but nothing shows under header<br>
+            <strong>Solution:</strong> Make sure you include <code>?event-id=YOUR_EVENT_ID</code> in the URL
+        </div>
+        
+        <div class="error">
+            <strong>Problem:</strong> Server not running<br>
+            <strong>Solution:</strong> Run <code>node server-supabase.js</code> in the terminal
+        </div>
+        
+        <h2>🧪 Live Test (Embedded):</h2>
+        <iframe src="http://localhost:3009/?event-id=embedded-test"></iframe>
+        
+        <div class="success">
+            <strong>Expected Result:</strong> You should see the GAA Feedback System interface with either:
+            <ul>
+                <li><strong>Coach View:</strong> "No Form Created" message with "Create Form" button</li>
+                <li><strong>Player View:</strong> "No Form Available" message (if no form exists for this event)</li>
+            </ul>
+        </div>
+        
+        <h2>🔧 Debug Information:</h2>
+        <div id="debug-info" class="info">
+            <p><strong>Server Status:</strong> <span id="server-status">Checking...</span></p>
+            <p><strong>Templates API:</strong> <span id="templates-status">Checking...</span></p>
+        </div>
+    </div>
+    
+    <script>
+        // Test server connectivity
+        fetch('http://localhost:3009/api/templates')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('server-status').textContent = '✅ Running';
+                document.getElementById('templates-status').textContent = `✅ ${data.length} templates loaded`;
+            })
+            .catch(error => {
+                document.getElementById('server-status').textContent = '❌ Not running';
+                document.getElementById('templates-status').textContent = '❌ Failed to load';
+            });
+    </script>
+</body>
+</html>
