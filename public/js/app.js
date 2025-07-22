@@ -29,6 +29,7 @@ class GAA_FeedbackApp {
         const eventIdParam = urlParams.get('event-id');
         const clubIdParam = urlParams.get('club-id');
         const userIdParam = urlParams.get('user-id');
+        const userTypeParam = urlParams.get('user-type');
         
         console.log('🔍 Full URL:', window.location.href);
         console.log('🔍 Search params:', window.location.search);
@@ -40,26 +41,35 @@ class GAA_FeedbackApp {
         }
         
         if (!userIdParam) {
-            this.showError('No user ID provided. Please use ?user-id=PLAYER_ID in the URL.');
+            this.showError('No user ID provided. Please use ?user-id=USER_ID in the URL.');
+            return;
+        }
+        
+        if (!userTypeParam) {
+            this.showError('No user type provided. Please use ?user-type=coach or ?user-type=player in the URL.');
             return;
         }
         
         // Use the event-id directly (no UUID generation needed)
         this.currentEventId = eventIdParam;
         this.currentClubId = clubIdParam; // Optional parameter
-        this.currentUserId = userIdParam; // Required parameter for tracking individual players
+        this.currentUserId = userIdParam; // Required parameter for tracking individual users from Bubble
         
-        // Automatically detect user type based on user-id parameter
-        if (userIdParam === 'coach' || userIdParam.toLowerCase().includes('coach')) {
+        // Set user type based on user-type parameter
+        if (userTypeParam.toLowerCase() === 'coach') {
             this.currentUserType = 'coach';
-        } else {
+        } else if (userTypeParam.toLowerCase() === 'player') {
             this.currentUserType = 'player';
+        } else {
+            this.showError('Invalid user type. Please use ?user-type=coach or ?user-type=player in the URL.');
+            return;
         }
         
         console.log('✅ Event ID from URL:', eventIdParam);
         console.log('✅ Club ID from URL:', clubIdParam || 'Not provided');
         console.log('✅ User ID from URL:', userIdParam);
-        console.log('✅ Auto-detected user type:', this.currentUserType);
+        console.log('✅ User Type from URL:', userTypeParam);
+        console.log('✅ Set user type to:', this.currentUserType);
         console.log('✅ this.currentClubId set to:', this.currentClubId);
     }
     
