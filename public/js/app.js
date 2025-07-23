@@ -153,7 +153,7 @@ class GAA_FeedbackApp {
             
             // Show appropriate interface
             console.log('Showing interface...');
-            this.showInterface();
+            await this.showInterface();
             
         } catch (error) {
             console.error('Error loading app:', error);
@@ -290,7 +290,7 @@ class GAA_FeedbackApp {
         }
     }
     
-    showInterface() {
+    async showInterface() {
         console.log('Showing interface for user type:', this.currentUserType);
         
         try {
@@ -301,7 +301,7 @@ class GAA_FeedbackApp {
                 this.showCoachInterface();
             } else {
                 console.log('Showing player interface');
-                this.showPlayerInterface();
+                await this.showPlayerInterface();
             }
         } catch (error) {
             console.error('Error showing interface:', error);
@@ -324,12 +324,13 @@ class GAA_FeedbackApp {
         }
     }
     
-    showPlayerInterface() {
+    async showPlayerInterface() {
         this.hideAllScreens();
         document.getElementById('player-interface').classList.remove('hidden');
         
         if (this.currentForm) {
-            this.showPlayerFormViewer();
+            // Check for existing responses before showing form
+            await this.checkExistingResponse();
         } else {
             this.showPlayerNoForm();
         }
@@ -1235,13 +1236,13 @@ class GAA_FeedbackApp {
         }, 3000);
     }
     
-    switchUserType() {
+    async switchUserType() {
         // Toggle between coach and player
         this.currentUserType = this.currentUserType === 'coach' ? 'player' : 'coach';
         console.log('Switched user type to:', this.currentUserType);
         
         // Show the appropriate interface
-        this.showInterface();
+        await this.showInterface();
     }
     
     // Coach Analytics and Response functions
