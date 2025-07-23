@@ -603,10 +603,10 @@ app.get('/api/questions/club/:clubId', async (req, res) => {
     }
 });
 
-// Submit response
+// Submit response (create new or update existing)
 app.post('/api/responses/submit', async (req, res) => {
     try {
-        const { formId, userId, responses, completionTimeSeconds, eventId, clubId } = req.body;
+        const { formId, userId, responses, completionTimeSeconds, eventId, clubId, isUpdate = false } = req.body;
 
         console.log('Received response submission:', {
             formId,
@@ -615,6 +615,7 @@ app.post('/api/responses/submit', async (req, res) => {
             completionTimeSeconds,
             eventId,
             clubId,
+            isUpdate,
             responseCount: Object.keys(responses || {}).length
         });
 
@@ -626,46 +627,96 @@ app.post('/api/responses/submit', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        // Create response record with user_id as string/text
-        console.log('Inserting response with user_id:', userId, 'type:', typeof userId);
+        let response;
         
-        const { data: response, error: responseError } = await supabase
-            .from('responses')
-            .insert({
-                form_id: formId,
-                user_id: String(userId), // Ensure it's a string
-                is_anonymous: false,
-                completion_time_seconds: completionTimeSeconds || 0
-            })
-            .select()
-            .single();
-
-        if (responseError) {
-            console.error('Error creating response record:', responseError);
-            console.error('Response error details:', {
-                message: responseError.message,
-                details: responseError.details,
-                hint: responseError.hint,
-                code: responseError.code
-            });
+        if (isUpdate) {
+            // Update existing response
+            console.log('Updating existing response for user:', userId);
             
-            // Check if it's a UUID format error for user_id
-            if (responseError.message && responseError.message.includes('invalid input syntax for type uuid')) {
+            const { data: existingResponse, error: findError } = await supabase
+                .from('responses')
+                .select('id')
+                .eq('form_id', formId)
+                .eq('user_id', String(userId))
+                .single();
+                
+            if (findError || !existingResponse) {
+                return res.status(404).json({ error: 'Existing response not found for update' });
+            }
+            
+            // Update the response record
+            const { data: updatedResponse, error: updateError } = await supabase
+                .from('responses')
+                .update({
+                    completion_time_seconds: completionTimeSeconds || 0,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', existingResponse.id)
+                .select()
+                .single();
+                
+            if (updateError) {
+                console.error('Error updating response record:', updateError);
+                throw updateError;
+            }
+            
+            response = updatedResponse;
+            
+            // Delete existing question responses
+            const { error: deleteError } = await supabase
+                .from('question_responses')
+                .delete()
+                .eq('response_id', response.id);
+                
+            if (deleteError) {
+                console.error('Error deleting old question responses:', deleteError);
+                throw deleteError;
+            }
+            
+        } else {
+            // Create new response record
+            console.log('Creating new response with user_id:', userId, 'type:', typeof userId);
+            
+            const { data: newResponse, error: responseError } = await supabase
+                .from('responses')
+                .insert({
+                    form_id: formId,
+                    user_id: String(userId), // Ensure it's a string
+                    is_anonymous: false,
+                    completion_time_seconds: completionTimeSeconds || 0
+                })
+                .select()
+                .single();
+                
+            if (responseError) {
+                console.error('Error creating response record:', responseError);
+                console.error('Response error details:', {
+                    message: responseError.message,
+                    details: responseError.details,
+                    hint: responseError.hint,
+                    code: responseError.code
+                });
+                
+                // Check if it's a UUID format error for user_id
+                if (responseError.message && responseError.message.includes('invalid input syntax for type uuid')) {
+                    return res.status(500).json({ 
+                        error: 'Database schema issue: user_id column is set to UUID type but should be TEXT', 
+                        details: 'The user_id column in the responses table needs to be changed from UUID to TEXT type in Supabase to handle regular user IDs from Bubble',
+                        technicalDetails: responseError.message
+                    });
+                }
+                
                 return res.status(500).json({ 
-                    error: 'Database schema issue: user_id column is set to UUID type but should be TEXT', 
-                    details: 'The user_id column in the responses table needs to be changed from UUID to TEXT type in Supabase to handle regular user IDs from Bubble',
-                    technicalDetails: responseError.message
+                    error: 'Failed to create response record', 
+                    details: responseError.message,
+                    hint: responseError.hint
                 });
             }
             
-            return res.status(500).json({ 
-                error: 'Failed to create response record', 
-                details: responseError.message,
-                hint: responseError.hint
-            });
+            response = newResponse;
         }
 
-        console.log('Response record created:', response.id);
+        console.log('Response record processed:', response.id);
 
         // Create question responses
         const questionResponses = Object.entries(responses).map(([questionId, answer]) => {
@@ -723,6 +774,72 @@ app.post('/api/responses/submit', async (req, res) => {
     } catch (error) {
         console.error('Error submitting response:', error);
         res.status(500).json({ error: 'Failed to submit response', details: error.message });
+    }
+});
+
+// Check if user has existing response for a form
+app.get('/api/forms/:formId/response/:userId', async (req, res) => {
+    try {
+        const { formId, userId } = req.params;
+        
+        console.log('Checking existing response for form:', formId, 'user:', userId);
+        
+        // Get existing response for this user and form
+        const { data: response, error: responseError } = await supabase
+            .from('responses')
+            .select(`
+                *,
+                question_responses (
+                    *,
+                    question:questions (*)
+                )
+            `)
+            .eq('form_id', formId)
+            .eq('user_id', String(userId))
+            .single();
+            
+        if (responseError) {
+            if (responseError.code === 'PGRST116') {
+                // No response found - this is normal for new users
+                return res.json({ hasResponse: false });
+            }
+            throw responseError;
+        }
+        
+        // Transform the response data to match frontend expectations
+        const responseData = {
+            id: response.id,
+            submittedAt: response.created_at,
+            completionTime: response.completion_time_seconds,
+            answers: {}
+        };
+        
+        // Convert question responses to answers object
+        response.question_responses.forEach(qr => {
+            const questionId = qr.question_id;
+            let answer = null;
+            
+            // Get the actual answer based on the response type
+            if (qr.answer_numeric !== null) {
+                answer = qr.answer_numeric;
+            } else if (qr.answer_choice !== null) {
+                answer = qr.answer_choice;
+            } else if (qr.answer_text !== null) {
+                answer = qr.answer_text;
+            }
+            
+            responseData.answers[questionId] = answer;
+        });
+        
+        console.log('Found existing response:', responseData);
+        res.json({ 
+            hasResponse: true, 
+            response: responseData 
+        });
+        
+    } catch (error) {
+        console.error('Error checking existing response:', error);
+        res.status(500).json({ error: 'Failed to check existing response', details: error.message });
     }
 });
 

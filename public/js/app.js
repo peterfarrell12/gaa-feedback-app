@@ -17,6 +17,8 @@ class GAA_FeedbackApp {
         this.selectedTemplate = null;
         this.templates = [];
         this.responses = {};
+        this.existingResponse = null;
+        this.isEditingResponse = false;
         
         this.init();
     }
@@ -194,6 +196,8 @@ class GAA_FeedbackApp {
         if (this.currentUserType === 'player') {
             console.log('No existing form found, creating mock form for player testing');
             this.createMockFormForPlayer();
+            // After creating mock form, check if player has existing response
+            await this.checkExistingResponse();
         } else {
             console.log('No existing form found for coach - will show template selection');
         }
@@ -252,6 +256,38 @@ class GAA_FeedbackApp {
         };
         
         console.log('Mock form created for player:', this.currentForm);
+    }
+    
+    async checkExistingResponse() {
+        if (!this.currentForm || !this.currentForm.id || !this.currentUserId) {
+            console.log('Cannot check existing response - missing form or user ID');
+            return;
+        }
+        
+        try {
+            console.log('Checking for existing response...');
+            const response = await fetch(`/api/forms/${this.currentForm.id}/response/${this.currentUserId}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.hasResponse) {
+                    console.log('Found existing response:', data.response);
+                    this.existingResponse = data.response;
+                    this.showPlayerExistingResponse();
+                } else {
+                    console.log('No existing response found - showing form');
+                    this.showPlayerFormViewer();
+                }
+            } else {
+                console.log('Error checking existing response, showing form');
+                this.showPlayerFormViewer();
+            }
+        } catch (error) {
+            console.error('Error checking existing response:', error);
+            // Fallback to showing the form
+            this.showPlayerFormViewer();
+        }
     }
     
     showInterface() {
@@ -943,6 +979,11 @@ class GAA_FeedbackApp {
                         btn.classList.add('selected');
                         this.responses[question.id] = i;
                     };
+                    
+                    // Pre-select if editing existing response
+                    if (this.responses[question.id] === i) {
+                        btn.classList.add('selected');
+                    }
                     ratingDiv.appendChild(btn);
                 }
                 
@@ -957,6 +998,11 @@ class GAA_FeedbackApp {
                 textarea.oninput = (e) => {
                     this.responses[question.id] = e.target.value;
                 };
+                
+                // Pre-populate if editing existing response
+                if (this.responses[question.id]) {
+                    textarea.value = this.responses[question.id];
+                }
                 container.appendChild(textarea);
                 break;
                 
@@ -976,6 +1022,11 @@ class GAA_FeedbackApp {
                     radio.onchange = () => {
                         this.responses[question.id] = option;
                     };
+                    
+                    // Pre-select if editing existing response
+                    if (this.responses[question.id] === option) {
+                        radio.checked = true;
+                    }
                     
                     const label = document.createElement('label');
                     label.htmlFor = radio.id;
@@ -1005,6 +1056,11 @@ class GAA_FeedbackApp {
                     radio.onchange = () => {
                         this.responses[question.id] = option.toLowerCase();
                     };
+                    
+                    // Pre-select if editing existing response
+                    if (this.responses[question.id] === option.toLowerCase()) {
+                        radio.checked = true;
+                    }
                     
                     const label = document.createElement('label');
                     label.htmlFor = radio.id;
@@ -1058,7 +1114,8 @@ class GAA_FeedbackApp {
             responses: this.responses,
             completionTimeSeconds: completionTime,
             eventId: this.currentEventId,
-            clubId: this.currentClubId
+            clubId: this.currentClubId,
+            isUpdate: this.isEditingResponse
         };
         
         console.log('Submitting response with data:', submissionData);
@@ -1100,6 +1157,11 @@ class GAA_FeedbackApp {
             
             const result = await response.json();
             console.log('Response submitted successfully via API:', result);
+            
+            // Clear edit state
+            this.isEditingResponse = false;
+            this.existingResponse = null;
+            
             this.showPlayerResponseSubmitted();
             
         } catch (error) {
@@ -1108,6 +1170,11 @@ class GAA_FeedbackApp {
             // For development/testing, show success even if API fails
             console.log('Network/API error, but showing success for development/testing');
             this.showNotification(`Submission error (${error.message}), but form completed successfully!`, 'warning');
+            
+            // Clear edit state
+            this.isEditingResponse = false;
+            this.existingResponse = null;
+            
             this.showPlayerResponseSubmitted();
         }
     }
@@ -1179,10 +1246,119 @@ class GAA_FeedbackApp {
     
     // Coach Analytics and Response functions
     
+    showPlayerExistingResponse() {
+        this.hideAllPlayerScreens();
+        document.getElementById('player-existing-response').classList.remove('hidden');
+        document.getElementById('player-existing-response').classList.add('active');
+        
+        // Populate the existing response view
+        this.populateExistingResponseView();
+    }
+    
     showPlayerResponseSubmitted() {
         this.hideAllPlayerScreens();
         document.getElementById('player-response-submitted').classList.remove('hidden');
         document.getElementById('player-response-submitted').classList.add('active');
+    }
+    
+    populateExistingResponseView() {
+        if (!this.existingResponse) return;
+        
+        // Set header information
+        document.getElementById('existing-response-form-title').textContent = this.currentForm.name;
+        document.getElementById('existing-response-event').textContent = this.currentEventId;
+        document.getElementById('existing-response-player-id').textContent = this.currentUserId;
+        
+        // Format and display submission date
+        const submissionDate = new Date(this.existingResponse.submittedAt);
+        document.getElementById('response-date').textContent = submissionDate.toLocaleDateString();
+        
+        // Populate response content
+        const container = document.getElementById('existing-response-content');
+        let html = '';
+        
+        this.currentForm.structure.sections.forEach((section, sectionIndex) => {
+            html += `
+                <div class="response-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-list"></i> ${section.title}
+                    </h3>
+                    <div class="section-responses">
+            `;
+            
+            section.questions.forEach((question, questionIndex) => {
+                const answer = this.existingResponse.answers[question.id];
+                const questionNumber = `${sectionIndex + 1}.${questionIndex + 1}`;
+                
+                html += `
+                    <div class="response-item">
+                        <div class="question-info">
+                            <span class="question-number">${questionNumber}</span>
+                            <span class="question-text">${question.text}</span>
+                        </div>
+                        <div class="answer-display">
+                            ${this.formatAnswerDisplay(question, answer)}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    formatAnswerDisplay(question, answer) {
+        if (answer === null || answer === undefined) {
+            return '<span class="no-answer">No response</span>';
+        }
+        
+        switch (question.type) {
+            case 'rating':
+                const scale = question.scale || 10;
+                return `<div class="rating-display">
+                    <span class="rating-value">${answer}</span>
+                    <span class="rating-scale">/ ${scale}</span>
+                    <div class="rating-stars">${'★'.repeat(Math.min(answer, 5))}${'☆'.repeat(Math.max(0, 5 - answer))}</div>
+                </div>`;
+                
+            case 'multiple_choice':
+                return `<span class="choice-answer">${answer}</span>`;
+                
+            case 'yes_no':
+                const icon = answer === 'yes' ? 'fa-check-circle' : 'fa-times-circle';
+                const color = answer === 'yes' ? 'text-success' : 'text-danger';
+                return `<span class="yn-answer ${color}"><i class="fas ${icon}"></i> ${answer.charAt(0).toUpperCase() + answer.slice(1)}</span>`;
+                
+            case 'text':
+                return `<div class="text-answer">${answer}</div>`;
+                
+            default:
+                return `<span class="answer">${answer}</span>`;
+        }
+    }
+    
+    editExistingResponse() {
+        // Set edit mode
+        this.isEditingResponse = true;
+        
+        // Populate the form with existing responses
+        this.responses = { ...this.existingResponse.answers };
+        
+        // Show the form in edit mode
+        this.showPlayerFormViewer();
+        
+        // Add edit mode indicator
+        this.showNotification('Editing your previous response. Your changes will update your submission.', 'info');
+    }
+    
+    viewResponseOnly() {
+        // Just stay on the existing response view - no action needed
+        console.log('Viewing response in read-only mode');
     }
     
     // Tab Functions (Coach)

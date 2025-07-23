@@ -5874,3 +5874,161 @@ body {
         display: flex !important;
     }
 }
+
+/* Existing Response View Styles */
+.existing-response-content {
+    padding: 20px 0;
+}
+
+.response-section {
+    margin-bottom: 30px;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.response-section .section-title {
+    color: var(--primary-color);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.section-responses {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.response-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.question-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.question-number {
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 12px;
+    min-width: 30px;
+    text-align: center;
+}
+
+.question-text {
+    flex: 1;
+    font-weight: 500;
+    color: #333;
+}
+
+.answer-display {
+    margin-left: 40px;
+    padding: 10px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+}
+
+.rating-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.rating-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.rating-scale {
+    color: #666;
+    font-size: 14px;
+}
+
+.rating-stars {
+    color: #ffc107;
+    font-size: 16px;
+}
+
+.choice-answer {
+    background: var(--primary-color);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.yn-answer {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.text-success {
+    color: #28a745;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+.text-answer {
+    font-style: italic;
+    color: #495057;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.no-answer {
+    color: #999;
+    font-style: italic;
+}
+
+.response-status {
+    color: #28a745;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Mobile responsive for existing response */
+@media (max-width: 768px) {
+    .existing-response-content {
+        padding: 10px 0;
+    }
+    
+    .response-section {
+        margin: 0 12px 20px 12px;
+        padding: 15px;
+    }
+    
+    .question-info {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .answer-display {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .response-item {
+        padding: 12px;
+    }
+}

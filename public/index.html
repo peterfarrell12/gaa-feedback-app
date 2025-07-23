@@ -466,6 +466,45 @@
                         </div>
                     </div>
 
+                    <!-- Player - Existing Response View -->
+                    <div id="player-existing-response" class="screen hidden">
+                        <div class="player-form-wrapper">
+                            <!-- Response Header -->
+                            <div class="player-form-header">
+                                <div class="form-info">
+                                    <h2 id="existing-response-form-title">Your Previous Response</h2>
+                                    <p class="form-subtitle">Event: <span id="existing-response-event"></span></p>
+                                    <div class="form-meta">
+                                        <span class="response-status">
+                                            <i class="fas fa-check-circle"></i> Submitted <span id="response-date"></span>
+                                        </span>
+                                        <span class="player-badge">
+                                            <i class="fas fa-user"></i> Player ID: <span id="existing-response-player-id"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Response Content -->
+                            <div class="player-form-container">
+                                <div class="existing-response-content" id="existing-response-content">
+                                    <!-- Previous responses will be shown here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="form-navigation">
+                                <button class="btn btn-outline nav-btn" onclick="window.app.viewResponseOnly()">
+                                    <i class="fas fa-eye"></i> View Only
+                                </button>
+                                
+                                <button class="btn btn-primary nav-btn" onclick="window.app.editExistingResponse()">
+                                    <i class="fas fa-edit"></i> Edit Response
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Player - Response Submitted -->
                     <div id="player-response-submitted" class="screen hidden">
                         <div class="screen-content">
