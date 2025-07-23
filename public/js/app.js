@@ -1,5 +1,14 @@
 // GAA Feedback System - URL Parameter Based App - v1752827100
 
+// Simple UUID generator for form IDs
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 class GAA_FeedbackApp {
     constructor() {
         this.currentUserType = 'coach'; // Default to coach
@@ -193,7 +202,7 @@ class GAA_FeedbackApp {
     createMockFormForPlayer() {
         // Create a mock form so players can test response submission
         this.currentForm = {
-            id: `mock-player-form-${this.currentEventId}`,
+            id: generateUUID(),
             name: 'Training Session Feedback',
             event_identifier: this.currentEventId,
             created_by: 'coach-mock',
@@ -591,7 +600,7 @@ class GAA_FeedbackApp {
                 console.log('Creating mock form for template:', this.selectedTemplate.name);
                 
                 this.currentForm = {
-                    id: `mock-form-${Date.now()}`,
+                    id: generateUUID(),
                     name: `${this.selectedTemplate.name} - Event ${this.currentEventId}`,
                     event_identifier: this.currentEventId,
                     structure: this.generateMockFormStructure(this.selectedTemplate),
