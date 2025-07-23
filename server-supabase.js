@@ -819,15 +819,23 @@ app.get('/api/forms/:formId/response/:userId', async (req, res) => {
             const questionId = qr.question_id;
             let answer = null;
             
+            console.log('Processing question response:', {
+                questionId,
+                answer_numeric: qr.answer_numeric,
+                answer_choice: qr.answer_choice,
+                answer_text: qr.answer_text
+            });
+            
             // Get the actual answer based on the response type
-            if (qr.answer_numeric !== null) {
+            if (qr.answer_numeric !== null && qr.answer_numeric !== undefined) {
                 answer = qr.answer_numeric;
-            } else if (qr.answer_choice !== null) {
+            } else if (qr.answer_choice !== null && qr.answer_choice !== undefined) {
                 answer = qr.answer_choice;
-            } else if (qr.answer_text !== null) {
+            } else if (qr.answer_text !== null && qr.answer_text !== undefined) {
                 answer = qr.answer_text;
             }
             
+            console.log('Final answer for question', questionId, ':', answer);
             responseData.answers[questionId] = answer;
         });
         

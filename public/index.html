@@ -472,15 +472,24 @@
                             <!-- Response Header -->
                             <div class="player-form-header">
                                 <div class="form-info">
-                                    <h2 id="existing-response-form-title">Your Previous Response</h2>
-                                    <p class="form-subtitle">Event: <span id="existing-response-event"></span></p>
-                                    <div class="form-meta">
-                                        <span class="response-status">
-                                            <i class="fas fa-check-circle"></i> Submitted <span id="response-date"></span>
-                                        </span>
-                                        <span class="player-badge">
-                                            <i class="fas fa-user"></i> Player ID: <span id="existing-response-player-id"></span>
-                                        </span>
+                                    <div class="header-content">
+                                        <div class="header-text">
+                                            <h2 id="existing-response-form-title">Your Previous Response</h2>
+                                            <p class="form-subtitle">Event: <span id="existing-response-event"></span></p>
+                                            <div class="form-meta">
+                                                <span class="response-status">
+                                                    <i class="fas fa-check-circle"></i> Submitted <span id="response-date"></span>
+                                                </span>
+                                                <span class="player-badge">
+                                                    <i class="fas fa-user"></i> Player ID: <span id="existing-response-player-id"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="header-action">
+                                            <button class="btn btn-outline-white" onclick="window.app.editExistingResponse()">
+                                                <i class="fas fa-edit"></i> Edit Response
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -492,16 +501,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Action Buttons -->
-                            <div class="form-navigation">
-                                <button class="btn btn-outline nav-btn" onclick="window.app.viewResponseOnly()">
-                                    <i class="fas fa-eye"></i> View Only
-                                </button>
-                                
-                                <button class="btn btn-primary nav-btn" onclick="window.app.editExistingResponse()">
-                                    <i class="fas fa-edit"></i> Edit Response
-                                </button>
-                            </div>
+                            <!-- No action buttons needed - edit is in header -->
                         </div>
                     </div>
 
