@@ -5969,20 +5969,28 @@ body {
 .answer-display {
     margin-left: 64px;
     padding: 20px 24px;
-    background: #f8fafc;
+    background: transparent;
     border-radius: 16px;
-    border: 1px solid #e2e8f0;
+    border: none;
     position: relative;
-    min-height: 56px;
+    min-height: auto;
     display: flex;
     align-items: center;
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .rating-display {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 4px 0;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .rating-value {
@@ -6013,6 +6021,9 @@ body {
     display: inline-block;
     box-shadow: 0 4px 12px rgba(14, 121, 178, 0.3);
     border: none;
+    max-width: 100%;
+    word-wrap: break-word;
+    box-sizing: border-box;
 }
 
 .yn-answer {
@@ -6023,6 +6034,8 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .text-success {
@@ -6040,10 +6053,16 @@ body {
     line-height: 1.7;
     white-space: pre-wrap;
     font-size: 16px;
-    padding: 0;
-    background: transparent;
-    border: none;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
     font-weight: 500;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .no-answer {
@@ -6056,6 +6075,9 @@ body {
     border: 1px dashed #cbd5e0;
     font-size: 15px;
     font-weight: 500;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .response-status {
@@ -6166,7 +6188,9 @@ body {
     
     .answer-display {
         margin-left: 60px;
-        padding: 18px 22px;
+        padding: 0;
+        width: calc(100% - 60px);
+        max-width: calc(100% - 60px);
     }
 }
 
@@ -6216,7 +6240,9 @@ body {
     .answer-display {
         margin-left: 0;
         margin-top: 8px;
-        padding: 16px 18px;
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
         border-radius: 12px;
     }
     
@@ -6319,8 +6345,10 @@ body {
     }
     
     .answer-display {
-        padding: 14px 16px;
+        padding: 0;
         border-radius: 10px;
+        width: 100%;
+        max-width: 100%;
     }
     
     .player-form-header {
