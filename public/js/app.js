@@ -273,6 +273,8 @@ class GAA_FeedbackApp {
                 
                 if (data.hasResponse) {
                     console.log('Found existing response:', data.response);
+                    console.log('Response answers object:', data.response.answers);
+                    console.log('Available answer keys:', Object.keys(data.response.answers));
                     this.existingResponse = data.response;
                     this.showPlayerExistingResponse();
                 } else {
@@ -1291,6 +1293,8 @@ class GAA_FeedbackApp {
                 const answer = this.existingResponse.answers[question.id];
                 const questionNumber = `${sectionIndex + 1}.${questionIndex + 1}`;
                 
+                console.log('Displaying question:', question.id, 'type:', question.type, 'answer:', answer);
+                
                 html += `
                     <div class="response-item">
                         <div class="question-info">
@@ -1314,7 +1318,9 @@ class GAA_FeedbackApp {
     }
     
     formatAnswerDisplay(question, answer) {
-        if (answer === null || answer === undefined) {
+        console.log('Formatting answer for question type:', question.type, 'answer:', answer, 'type of answer:', typeof answer);
+        
+        if (answer === null || answer === undefined || answer === '') {
             return '<span class="no-answer">No response</span>';
         }
         
