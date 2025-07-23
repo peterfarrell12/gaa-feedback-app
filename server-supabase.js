@@ -605,13 +605,15 @@ app.get('/api/questions/club/:clubId', async (req, res) => {
 // Submit response
 app.post('/api/responses/submit', async (req, res) => {
     try {
-        const { formId, userId, responses, completionTimeSeconds } = req.body;
+        const { formId, userId, responses, completionTimeSeconds, eventId, clubId } = req.body;
 
         console.log('Received response submission:', {
             formId,
             userId,
             responses,
             completionTimeSeconds,
+            eventId,
+            clubId,
             responseCount: Object.keys(responses || {}).length
         });
 
@@ -637,7 +639,17 @@ app.post('/api/responses/submit', async (req, res) => {
 
         if (responseError) {
             console.error('Error creating response record:', responseError);
-            throw responseError;
+            console.error('Response error details:', {
+                message: responseError.message,
+                details: responseError.details,
+                hint: responseError.hint,
+                code: responseError.code
+            });
+            return res.status(500).json({ 
+                error: 'Failed to create response record', 
+                details: responseError.message,
+                hint: responseError.hint
+            });
         }
 
         console.log('Response record created:', response.id);
@@ -675,7 +687,17 @@ app.post('/api/responses/submit', async (req, res) => {
 
             if (questionsError) {
                 console.error('Error creating question responses:', questionsError);
-                throw questionsError;
+                console.error('Questions error details:', {
+                    message: questionsError.message,
+                    details: questionsError.details,
+                    hint: questionsError.hint,
+                    code: questionsError.code
+                });
+                return res.status(500).json({ 
+                    error: 'Failed to create question responses', 
+                    details: questionsError.message,
+                    hint: questionsError.hint
+                });
             }
 
             console.log('Question responses created:', insertedQuestions.length);
