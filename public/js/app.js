@@ -1037,7 +1037,7 @@ class GAA_FeedbackApp {
         }
         
         // Validate we have responses to submit
-        if (!this.formState.responses || Object.keys(this.formState.responses).length === 0) {
+        if (!this.responses || Object.keys(this.responses).length === 0) {
             console.error('No responses to submit');
             this.showNotification('Please answer at least one question before submitting.', 'error');
             return;
@@ -1046,7 +1046,7 @@ class GAA_FeedbackApp {
         const submissionData = {
             formId: this.currentForm.id,
             userId: this.currentUserId,
-            responses: this.formState.responses,
+            responses: this.responses,
             completionTimeSeconds: completionTime,
             eventId: this.currentEventId,
             clubId: this.currentClubId
@@ -1055,8 +1055,8 @@ class GAA_FeedbackApp {
         console.log('Submitting response with data:', submissionData);
         console.log('Form ID:', this.currentForm.id);
         console.log('User ID:', this.currentUserId);
-        console.log('Responses:', this.formState.responses);
-        console.log('Response count:', Object.keys(this.formState.responses).length);
+        console.log('Responses:', this.responses);
+        console.log('Response count:', Object.keys(this.responses).length);
         
         try {
             // Try API submission first
@@ -2201,7 +2201,7 @@ class GAA_FeedbackApp {
                     id: `custom_${Date.now()}`,
                     text: 'New Question',
                     type: 'text',
-                    required: false,
+                    required: true,
                     question_bank: false, // Default to false
                     club_identifier: this.currentClubId // Add club identifier to new questions
                 };
@@ -2224,7 +2224,7 @@ class GAA_FeedbackApp {
             id: `custom_${Date.now()}`,
             text: 'New Custom Question',
             type: 'text',
-            required: false,
+            required: true,
             question_bank: false, // Default to false
             club_identifier: this.currentClubId // Add club identifier
         };
@@ -2360,17 +2360,14 @@ class GAA_FeedbackApp {
                 
                 <div class="checkbox-group">
                     <div class="checkbox-item">
-                        <input type="checkbox" id="question-required" ${question.required ? 'checked' : ''}>
+                        <input type="checkbox" id="question-required" ${question.required !== false ? 'checked' : ''}>
                         <label for="question-required">Required</label>
                     </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="question-anonymous" ${question.anonymous ? 'checked' : ''}>
-                        <label for="question-anonymous">Anonymous (players can respond anonymously)</label>
-                    </div>
+                    ${!question.id.startsWith('custom_') && !question.id.startsWith('q') ? `
                     <div class="checkbox-item">
                         <input type="checkbox" id="question-save-to-bank" ${question.question_bank ? 'checked' : ''}>
-                        <label for="question-save-to-bank">Save to Question Bank (reusable for future forms)</label>
-                    </div>
+                        <label for="question-save-to-bank">Save to Bank (reusable for future forms)</label>
+                    </div>` : ''}
                 </div>
                 
                 <div class="form-group">
@@ -2420,22 +2417,21 @@ class GAA_FeedbackApp {
         const newText = document.getElementById('question-text').value.trim();
         const newType = document.getElementById('question-type').value;
         const newRequired = document.getElementById('question-required').checked;
-        const newAnonymous = document.getElementById('question-anonymous').checked;
-        const newQuestionBank = document.getElementById('question-save-to-bank').checked;
+        const saveToBank = document.getElementById('question-save-to-bank');
+        const newQuestionBank = saveToBank ? saveToBank.checked : false;
         
         // Update question
         question.text = newText;
         question.type = newType;
         question.required = newRequired;
-        question.anonymous = newAnonymous;
         question.question_bank = newQuestionBank;
         
-        // Set club_identifier if question is being saved to question bank
-        if (newQuestionBank && this.currentClubId) {
+        // Remove anonymous property completely
+        delete question.anonymous;
+        
+        // Set club_identifier for ALL questions (needed for database)
+        if (this.currentClubId) {
             question.club_identifier = this.currentClubId;
-        } else if (!newQuestionBank) {
-            // If not saving to question bank, remove club_identifier
-            delete question.club_identifier;
         }
         
         console.log('💾 Saving question with club_identifier:', question.club_identifier);
@@ -2493,6 +2489,10 @@ class GAA_FeedbackApp {
         if (!question.options) {
             question.options = [];
         }
+        
+        // Preserve existing option values before re-rendering
+        this.preserveOptionValues();
+        
         question.options.push('New Option');
         this.renderQuestionEditor(question);
     }
@@ -2500,8 +2500,29 @@ class GAA_FeedbackApp {
     removeOption(index) {
         const question = this.formBuilder.selectedQuestion;
         if (question.options && question.options[index]) {
+            // Preserve existing option values before re-rendering
+            this.preserveOptionValues();
+            
             question.options.splice(index, 1);
             this.renderQuestionEditor(question);
+        }
+    }
+    
+    preserveOptionValues() {
+        // Save current values from option inputs before re-rendering
+        const question = this.formBuilder.selectedQuestion;
+        if (!question || question.type !== 'multiple_choice') return;
+        
+        const optionInputs = document.querySelectorAll('[data-option-index]');
+        const currentValues = [];
+        
+        optionInputs.forEach((input, index) => {
+            currentValues[index] = input.value.trim();
+        });
+        
+        // Update the question options with current values
+        if (currentValues.length > 0) {
+            question.options = currentValues.filter(val => val !== '');
         }
     }
     
