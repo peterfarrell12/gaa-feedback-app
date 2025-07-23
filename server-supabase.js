@@ -12,6 +12,7 @@ require('dotenv').config({ path: '.env.local' });
 const app = express();
 const PORT = process.env.PORT || 3009;
 
+
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -625,12 +626,14 @@ app.post('/api/responses/submit', async (req, res) => {
             return res.status(400).json({ error: 'User ID is required' });
         }
 
-        // Create response record
+        // Create response record with user_id as string/text
+        console.log('Inserting response with user_id:', userId, 'type:', typeof userId);
+        
         const { data: response, error: responseError } = await supabase
             .from('responses')
             .insert({
                 form_id: formId,
-                user_id: userId,
+                user_id: String(userId), // Ensure it's a string
                 is_anonymous: false,
                 completion_time_seconds: completionTimeSeconds || 0
             })
@@ -645,6 +648,16 @@ app.post('/api/responses/submit', async (req, res) => {
                 hint: responseError.hint,
                 code: responseError.code
             });
+            
+            // Check if it's a UUID format error for user_id
+            if (responseError.message && responseError.message.includes('invalid input syntax for type uuid')) {
+                return res.status(500).json({ 
+                    error: 'Database schema issue: user_id column is set to UUID type but should be TEXT', 
+                    details: 'The user_id column in the responses table needs to be changed from UUID to TEXT type in Supabase to handle regular user IDs from Bubble',
+                    technicalDetails: responseError.message
+                });
+            }
+            
             return res.status(500).json({ 
                 error: 'Failed to create response record', 
                 details: responseError.message,
