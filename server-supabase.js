@@ -648,8 +648,7 @@ app.post('/api/responses/submit', async (req, res) => {
             const { data: updatedResponse, error: updateError } = await supabase
                 .from('responses')
                 .update({
-                    completion_time_seconds: completionTimeSeconds || 0,
-                    updated_at: new Date().toISOString()
+                    completion_time_seconds: completionTimeSeconds || 0
                 })
                 .eq('id', existingResponse.id)
                 .select()
