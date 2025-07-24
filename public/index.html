@@ -82,13 +82,13 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Recent Templates Section -->
+                                <!-- Recent Forms Section -->
                                 <div class="template-section">
                                     <div class="section-header">
-                                        <h2>Recent Templates</h2>
+                                        <h2>Recent Forms</h2>
                                     </div>
-                                    <div class="template-grid" id="recent-templates-grid">
-                                        <!-- Recent templates will be loaded here -->
+                                    <div class="template-grid" id="recent-forms-grid">
+                                        <!-- Recent forms will be loaded here -->
                                     </div>
                                 </div>
                                 
@@ -229,7 +229,12 @@
                     <!-- Coach - Form Area (with tabs) -->
                     <div id="coach-form-area" class="screen hidden">
                         <div class="screen-header">
-                            <h2 id="form-title">Form Title</h2>
+                            <div class="form-title-section">
+                                <h2 id="form-title">Form Title</h2>
+                                <button class="btn-icon" id="rename-form-btn" onclick="window.app.showRenameForm()" title="Rename Form">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
                             <p>Event: <span id="event-name-area"></span></p>
                         </div>
 

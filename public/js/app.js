@@ -350,8 +350,8 @@ class GAA_FeedbackApp {
     renderTemplateGallery() {
         console.log('Rendering template gallery...');
         
-        // Render recent templates (last 3 used by the club)
-        this.renderRecentTemplates();
+        // Render recent forms (last 3 created by the club)
+        this.renderRecentForms();
         
         // Render all templates
         const templateGrid = document.getElementById('template-grid');
@@ -381,47 +381,196 @@ class GAA_FeedbackApp {
         console.log('Template gallery rendered successfully');
     }
     
-    renderRecentTemplates() {
-        const recentGrid = document.getElementById('recent-templates-grid');
+    renderRecentForms() {
+        const recentGrid = document.getElementById('recent-forms-grid');
         if (!recentGrid) return;
         
-        // Mock recent templates data (in real app, this would come from server)
-        const recentTemplates = [
-            {
-                name: 'Post-Match Review',
-                description: 'Quick feedback after the last championship match',
-                type: 'match',
-                sections: 4,
-                questions: 12,
-                estimatedTime: '6 min',
-                lastUsed: '2 days ago'
-            },
-            {
-                name: 'Training Session Evaluation',
-                description: 'Weekly training performance assessment',
-                type: 'training',
-                sections: 3,
-                questions: 8,
-                estimatedTime: '4 min',
-                lastUsed: '5 days ago'
-            },
-            {
-                name: 'Team Spirit Check',
-                description: 'Monthly team morale and cohesion survey',
-                type: 'team',
-                sections: 2,
-                questions: 6,
-                estimatedTime: '3 min',
-                lastUsed: '1 week ago'
+        // Load recent forms created by this club
+        this.loadRecentForms().then(recentForms => {
+            recentGrid.innerHTML = '';
+            
+            if (recentForms.length === 0) {
+                recentGrid.innerHTML = '<p class="no-data">No recent forms found. Create your first form!</p>';
+                return;
             }
-        ];
-        
-        recentGrid.innerHTML = '';
-        
-        recentTemplates.forEach(template => {
-            const templateCard = this.createTemplateCard(template);
-            recentGrid.appendChild(templateCard);
+            
+            recentForms.forEach(form => {
+                const formCard = this.createRecentFormCard(form);
+                recentGrid.appendChild(formCard);
+            });
+        }).catch(error => {
+            console.error('Error loading recent forms:', error);
+            recentGrid.innerHTML = '<p class="no-data">Error loading recent forms.</p>';
         });
+    }
+    
+    async loadRecentForms() {
+        try {
+            // Get recent forms for this club (last 3 forms)
+            const response = await fetch(`/api/forms?event_id=${this.currentEventId}&limit=3&recent=true`);
+            if (!response.ok) throw new Error('Failed to load recent forms');
+            
+            const forms = await response.json();
+            return forms.slice(0, 3); // Limit to 3 most recent
+        } catch (error) {
+            console.error('Error fetching recent forms:', error);
+            return [];
+        }
+    }
+    
+    createRecentFormCard(form) {
+        const card = document.createElement('div');
+        card.className = 'template-card recent-form-card';
+        
+        const sectionCount = form.structure?.sections?.length || 0;
+        const questionCount = form.structure?.sections?.reduce((total, section) => total + (section.questions?.length || 0), 0) || 0;
+        const createdDate = form.created_at ? new Date(form.created_at).toLocaleDateString() : 'Recently';
+        
+        card.innerHTML = `
+            <div class="template-content">
+                <div class="template-content-header">
+                    <div class="template-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="template-info">
+                        <h3>${form.name}</h3>
+                        <p class="template-description">Custom form created ${createdDate}</p>
+                    </div>
+                </div>
+                <div class="template-stats">
+                    <div class="template-stat">
+                        <span class="stat-value">${sectionCount}</span>
+                        <span class="stat-label">Sections</span>
+                    </div>
+                    <div class="template-stat">
+                        <span class="stat-value">${questionCount}</span>
+                        <span class="stat-label">Questions</span>
+                    </div>
+                    <div class="template-stat">
+                        <span class="stat-value">${form.estimated_time || '~5 min'}</span>
+                        <span class="stat-label">Duration</span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-sm btn-outline" onclick="window.app.duplicateForm('${form.id}')">
+                        <i class="fas fa-copy"></i> Duplicate
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        return card;
+    }
+    
+    async duplicateForm(formId) {
+        try {
+            console.log('Duplicating form:', formId);
+            
+            // Get the form data
+            const response = await fetch(`/api/forms?event_id=${this.currentEventId}`);
+            if (!response.ok) throw new Error('Failed to load forms');
+            
+            const forms = await response.json();
+            const formToDuplicate = forms.find(f => f.id === formId);
+            
+            if (!formToDuplicate) {
+                throw new Error('Form not found');
+            }
+            
+            // Create a new form based on the existing one
+            const duplicatedFormData = {
+                name: `${formToDuplicate.name} (Copy)`,
+                event_identifier: this.currentEventId,
+                sections: formToDuplicate.structure.sections.map(section => ({
+                    title: section.title,
+                    description: section.description || '',
+                    questions: section.questions.map(question => ({
+                        text: question.text,
+                        type: question.type,
+                        options: question.options || null,
+                        scale: question.scale || null,
+                        required: question.required !== undefined ? question.required : true,
+                        club_identifier: this.currentClubId,
+                        anonymous: false,
+                        question_bank: false
+                    }))
+                }))
+            };
+            
+            // Save the duplicated form
+            const saveResponse = await fetch('/api/forms/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(duplicatedFormData)
+            });
+            
+            if (!saveResponse.ok) {
+                throw new Error('Failed to duplicate form');
+            }
+            
+            const newForm = await saveResponse.json();
+            console.log('Form duplicated successfully:', newForm);
+            
+            // Refresh the interface
+            this.showAlert('Form duplicated successfully!', 'success');
+            this.renderRecentForms();
+            
+        } catch (error) {
+            console.error('Error duplicating form:', error);
+            this.showAlert('Failed to duplicate form. Please try again.', 'error');
+        }
+    }
+    
+    showRenameForm() {
+        const currentName = document.getElementById('form-title').textContent;
+        const newName = prompt('Enter new form name:', currentName);
+        
+        if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
+            this.renameForm(newName.trim());
+        }
+    }
+    
+    async renameForm(newName) {
+        try {
+            if (!this.currentForm || !this.currentForm.id) {
+                throw new Error('No form selected');
+            }
+            
+            console.log('Renaming form:', this.currentForm.id, 'to:', newName);
+            
+            // Update form name via API
+            const response = await fetch(`/api/forms/${this.currentForm.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: newName,
+                    sections: this.currentForm.structure.sections
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to rename form');
+            }
+            
+            const updatedForm = await response.json();
+            
+            // Update local state
+            this.currentForm.name = newName;
+            
+            // Update UI
+            document.getElementById('form-title').textContent = newName;
+            
+            console.log('Form renamed successfully');
+            this.showAlert('Form renamed successfully!', 'success');
+            
+        } catch (error) {
+            console.error('Error renaming form:', error);
+            this.showAlert('Failed to rename form. Please try again.', 'error');
+        }
     }
     
     createTemplateCard(template) {

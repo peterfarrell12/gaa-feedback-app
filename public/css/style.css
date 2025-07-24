@@ -1860,6 +1860,83 @@ body {
     color: var(--text-secondary);
 }
 
+.form-title-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.form-title-section h2 {
+    margin: 0;
+}
+
+.btn-icon {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.btn-icon:hover {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-actions {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.recent-form-card {
+    position: relative;
+}
+
+.recent-form-card .template-content {
+    padding: 20px;
+}
+
+.recent-form-card .template-stats {
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0;
+}
+
+.recent-form-card .template-stat {
+    text-align: center;
+    flex: 1;
+}
+
+.recent-form-card .stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.recent-form-card .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 /* Loading Screen */
 .loading-screen {
     display: flex;
