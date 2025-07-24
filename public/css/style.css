@@ -4401,18 +4401,21 @@ body {
     }
 }
 
-/* Mobile-first badges */
+/* Mobile-first badges - Updated to match header styling */
 .estimated-time,
 .player-badge {
     display: flex;
     align-items: center;
     gap: 4px;
     font-size: 12px;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 6px 10px;
-    border-radius: 16px;
-    backdrop-filter: blur(10px);
+    color: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.18);
+    padding: 8px 14px;
+    border-radius: 12px;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     white-space: nowrap;
+    font-weight: 600;
 }
 
 @media (min-width: 640px) {
@@ -4420,17 +4423,17 @@ body {
     .player-badge {
         gap: 6px;
         font-size: 13px;
-        padding: 7px 11px;
-        border-radius: 18px;
+        padding: 10px 18px;
+        border-radius: 12px;
     }
 }
 
 @media (min-width: 1024px) {
     .estimated-time,
     .player-badge {
-        font-size: 14px;
-        padding: 8px 12px;
-        border-radius: 20px;
+        font-size: 13px;
+        padding: 10px 18px;
+        border-radius: 12px;
     }
 }
 
@@ -4473,20 +4476,20 @@ body {
 
 /* Mobile-first form sections */
 .form-sections {
-    padding: 16px;
+    padding: 24px 16px;
     min-height: 300px;
 }
 
 @media (min-width: 640px) {
     .form-sections {
-        padding: 20px;
+        padding: 32px 20px;
         min-height: 350px;
     }
 }
 
 @media (min-width: 1024px) {
     .form-sections {
-        padding: 30px;
+        padding: 40px 30px;
         min-height: 400px;
     }
 }
@@ -4574,6 +4577,7 @@ body {
     background: #f8f9fa;
     border-radius: 12px;
     padding: 16px;
+    margin: 0 8px;
     border: 2px solid transparent;
     transition: all 0.2s ease;
 }
@@ -4582,6 +4586,7 @@ body {
     .form-question {
         border-radius: 10px;
         padding: 18px;
+        margin: 0 12px;
     }
 }
 
@@ -4589,6 +4594,7 @@ body {
     .form-question {
         border-radius: 12px;
         padding: 20px;
+        margin: 0 16px;
     }
 }
 
@@ -4880,25 +4886,26 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: 16px 12px;
     background: #f8f9fa;
     border-radius: 12px;
     border: 1px solid #e9ecef;
-    gap: 12px;
+    gap: 8px;
 }
 
 @media (min-width: 640px) {
     .form-navigation {
-        padding: 18px 24px;
+        padding: 18px 16px;
         border-radius: 10px;
+        gap: 12px;
     }
 }
 
 @media (min-width: 1024px) {
     .form-navigation {
-        padding: 20px 30px;
+        padding: 20px 24px;
         border-radius: 12px;
-        gap: 0;
+        gap: 16px;
     }
 }
 
@@ -4945,23 +4952,20 @@ body {
     display: flex;
     gap: 6px;
     align-items: center;
-    flex: 1;
     justify-content: center;
-    max-width: 120px;
-    overflow-x: auto;
+    flex: 1;
+    min-width: 0;
 }
 
 @media (min-width: 640px) {
     .section-indicators {
         gap: 8px;
-        max-width: 150px;
     }
 }
 
 @media (min-width: 1024px) {
     .section-indicators {
-        max-width: none;
-        overflow: visible;
+        gap: 10px;
     }
 }
 
