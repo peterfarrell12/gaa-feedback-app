@@ -6087,9 +6087,10 @@ body {
     align-items: center;
     gap: 8px;
     background: rgba(255, 255, 255, 0.2);
-    padding: 8px 16px;
-    border-radius: 8px;
-    backdrop-filter: blur(10px);
+    padding: 10px 18px;
+    border-radius: 12px;
+    backdrop-filter: blur(15px);
+    font-size: 15px;
 }
 
 /* Fix header visibility by adding better background */
