@@ -1273,7 +1273,16 @@ class GAA_FeedbackApp {
         document.getElementById('existing-response-player-id').textContent = this.currentUserId;
         
         // Format and display submission date
-        const submissionDate = new Date(this.existingResponse.submittedAt);
+        let submissionDate;
+        if (this.existingResponse.submittedAt && this.existingResponse.submittedAt !== 'null') {
+            submissionDate = new Date(this.existingResponse.submittedAt);
+            // Check if date is valid
+            if (isNaN(submissionDate.getTime())) {
+                submissionDate = new Date(); // Fallback to current date
+            }
+        } else {
+            submissionDate = new Date(); // Fallback to current date
+        }
         document.getElementById('response-date').textContent = submissionDate.toLocaleDateString();
         
         // Populate response content
@@ -1612,7 +1621,13 @@ class GAA_FeedbackApp {
         let html = '';
         
         this.responsesData.forEach((response, index) => {
-            const submittedDate = new Date(response.submittedAt).toLocaleString();
+            let submittedDate;
+            if (response.submittedAt && response.submittedAt !== 'null') {
+                const date = new Date(response.submittedAt);
+                submittedDate = isNaN(date.getTime()) ? 'Recently' : date.toLocaleString();
+            } else {
+                submittedDate = 'Recently';
+            }
             const completionTime = Math.round(response.completionTime / 60);
             
             html += `
