@@ -583,7 +583,9 @@ class GAA_FeedbackApp {
         card.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Template card direct click handler triggered for:', template.name);
+            console.log('🎯 Template card direct click handler triggered for:', template.name);
+            console.log('🎯 Template object:', template);
+            console.log('🎯 About to call selectTemplate...');
             this.selectTemplate(template);
         });
         
@@ -626,28 +628,41 @@ class GAA_FeedbackApp {
     }
     
     selectTemplate(template) {
-        console.log('selectTemplate called with:', template);
-        console.log('Template name:', template?.name);
+        console.log('🚀 selectTemplate called with:', template);
+        console.log('🚀 Template name:', template?.name);
+        console.log('🚀 Template type:', template?.type);
+        
+        if (!template) {
+            console.error('❌ No template provided to selectTemplate');
+            return;
+        }
+        
         this.selectedTemplate = template;
         
         try {
-            // Show template preview popup
+            console.log('🚀 About to show template preview...');
             this.showTemplatePreview(template);
+            console.log('✅ Template preview shown successfully');
         } catch (error) {
-            console.error('Error showing template preview:', error);
+            console.error('❌ Error showing template preview:', error);
+            console.error('❌ Error stack:', error.stack);
         }
     }
     
     showTemplatePreview(template) {
+        console.log('🎨 showTemplatePreview called with:', template.name);
+        
         // Create modal overlay
         const modalOverlay = document.createElement('div');
         modalOverlay.className = 'modal-overlay';
         modalOverlay.onclick = () => this.closeTemplatePreview();
+        console.log('🎨 Modal overlay created');
         
         // Create modal content
         const modal = document.createElement('div');
         modal.className = 'template-preview-modal';
         modal.onclick = (e) => e.stopPropagation();
+        console.log('🎨 Modal content created');
         
         // Determine template icon
         let iconClass = 'fas fa-clipboard-list';
@@ -712,12 +727,18 @@ class GAA_FeedbackApp {
         `;
         
         modalOverlay.appendChild(modal);
+        console.log('🎨 Modal appended to overlay');
+        
         document.body.appendChild(modalOverlay);
+        console.log('🎨 Modal overlay added to body');
         
         // Add animation
         setTimeout(() => {
             modalOverlay.classList.add('active');
+            console.log('✨ Modal activated with .active class');
         }, 10);
+        
+        console.log('✅ showTemplatePreview completed successfully');
     }
     
     closeTemplatePreview() {
