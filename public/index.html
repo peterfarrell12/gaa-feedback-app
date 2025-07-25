@@ -235,15 +235,11 @@
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </div>
-                            <p>Event: <span id="event-name-area"></span></p>
                         </div>
 
                         <!-- Navigation Tabs -->
                         <div class="tabs">
-                            <button class="tab-button active" onclick="showTab('analysis')">
-                                <i class="fas fa-chart-bar"></i> Analysis
-                            </button>
-                            <button class="tab-button" onclick="showTab('responses')">
+                            <button class="tab-button active" onclick="showTab('responses')">
                                 <i class="fas fa-comments"></i> Responses
                             </button>
                             <button class="tab-button" onclick="showTab('form')">
@@ -253,115 +249,55 @@
 
                         <!-- Tab Content -->
                         <div class="tab-content">
-                            <!-- Analysis Tab -->
-                            <div id="analysis-tab" class="tab-pane active">
-                                <div class="analytics-dashboard">
-                                    <!-- Key Metrics Cards -->
-                                    <div class="analytics-cards">
-                                        <div class="analytics-card">
-                                            <div class="card-header">
-                                                <h3>Response Rate</h3>
-                                                <i class="fas fa-chart-line"></i>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="metric">
-                                                    <span class="metric-value" id="response-rate">0%</span>
-                                                    <span class="metric-label">of players responded</span>
-                                                </div>
-                                                <div class="progress-bar">
-                                                    <div class="progress-fill" id="response-rate-progress"></div>
-                                                </div>
-                                            </div>
+                            <!-- Responses Tab -->
+                            <div id="responses-tab" class="tab-pane active">
+                                <!-- Key Metrics Cards -->
+                                <div class="analytics-cards">
+                                    <div class="analytics-card">
+                                        <div class="card-header">
+                                            <h3>Response Rate</h3>
+                                            <i class="fas fa-chart-line"></i>
                                         </div>
-                                        
-                                        <div class="analytics-card">
-                                            <div class="card-header">
-                                                <h3>Total Responses</h3>
-                                                <i class="fas fa-users"></i>
+                                        <div class="card-body">
+                                            <div class="metric">
+                                                <span class="metric-value" id="response-rate">0%</span>
+                                                <span class="metric-label">of players responded</span>
                                             </div>
-                                            <div class="card-body">
-                                                <div class="metric">
-                                                    <span class="metric-value" id="total-responses">0</span>
-                                                    <span class="metric-label">responses collected</span>
-                                                </div>
-                                                <div class="completion-indicator">
-                                                    <span class="player-count" id="player-count">0 players</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="analytics-card">
-                                            <div class="card-header">
-                                                <h3>Avg. Completion Time</h3>
-                                                <i class="fas fa-clock"></i>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="metric">
-                                                    <span class="metric-value" id="avg-completion-time">--</span>
-                                                    <span class="metric-label">minutes</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="analytics-card">
-                                            <div class="card-header">
-                                                <h3>Engagement Score</h3>
-                                                <i class="fas fa-fire"></i>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="metric">
-                                                    <span class="metric-value" id="engagement-score">--</span>
-                                                    <span class="metric-label">out of 100</span>
-                                                </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" id="response-rate-progress"></div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <!-- Charts Section -->
-                                    <div class="analytics-charts">
-                                        <div class="chart-grid">
-                                            <div class="chart-card">
-                                                <div class="chart-header">
-                                                    <h3><i class="fas fa-chart-pie"></i> Response Distribution</h3>
-                                                </div>
-                                                <div class="chart-container">
-                                                    <canvas id="responseDistributionChart"></canvas>
-                                                </div>
+                                    <div class="analytics-card">
+                                        <div class="card-header">
+                                            <h3>Total Responses</h3>
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="metric">
+                                                <span class="metric-value" id="total-responses">0</span>
+                                                <span class="metric-label">responses collected</span>
                                             </div>
-                                            
-                                            <div class="chart-card">
-                                                <div class="chart-header">
-                                                    <h3><i class="fas fa-chart-bar"></i> Rating Analysis</h3>
-                                                </div>
-                                                <div class="chart-container">
-                                                    <canvas id="ratingAnalysisChart"></canvas>
-                                                </div>
+                                            <div class="completion-indicator">
+                                                <span class="player-count" id="player-count">0 players</span>
                                             </div>
-                                            
-                                            <div class="chart-card">
-                                                <div class="chart-header">
-                                                    <h3><i class="fas fa-chart-line"></i> Completion Times</h3>
-                                                </div>
-                                                <div class="chart-container">
-                                                    <canvas id="completionTimeChart"></canvas>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="chart-card">
-                                                <div class="chart-header">
-                                                    <h3><i class="fas fa-list-alt"></i> Key Insights</h3>
-                                                </div>
-                                                <div class="insights-content" id="analytics-insights">
-                                                    <p class="no-data">No insights available yet.</p>
-                                                </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="analytics-card">
+                                        <div class="card-header">
+                                            <h3>Avg. Completion Time</h3>
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="metric">
+                                                <span class="metric-value" id="avg-completion-time">--</span>
+                                                <span class="metric-label">minutes</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Responses Tab -->
-                            <div id="responses-tab" class="tab-pane">
                                 <div class="responses-dashboard">
                                     <div class="responses-header">
                                         <h3><i class="fas fa-comments"></i> Response Analysis</h3>
@@ -423,8 +359,7 @@
                             <!-- Form Header -->
                             <div class="player-form-header">
                                 <div class="form-info">
-                                    <h2 id="player-form-title">Form Title</h2>
-                                    <p class="form-subtitle">Event: <span id="event-name-form"></span></p>
+                                    <h2>Feedback Form</h2>
                                     <div class="form-meta">
                                         <span class="estimated-time" id="estimated-time">
                                             <i class="fas fa-clock"></i> ~5 minutes
@@ -525,6 +460,6 @@
         </main>
     </div>
 
-    <script src="js/app.js?v=1752829100"></script>
+    <script src="js/app.js?v=1752829400"></script>
 </body>
 </html>

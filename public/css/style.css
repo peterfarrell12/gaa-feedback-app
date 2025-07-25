@@ -3578,11 +3578,12 @@ body {
     }
 }
 
-/* Desktop - 4 columns */
+/* Desktop - 3 columns for the 3 analytics cards */
 @media (min-width: 1024px) {
     .analytics-cards {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         margin-bottom: 30px;
+        max-width: 900px;
     }
 }
 

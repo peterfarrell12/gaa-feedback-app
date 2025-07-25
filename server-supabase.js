@@ -158,6 +158,76 @@ app.get('/api/templates', async (req, res) => {
     }
 });
 
+// Get recent forms by club
+app.get('/api/forms/recent/:clubId', async (req, res) => {
+    try {
+        const { clubId } = req.params;
+        const { limit = 3 } = req.query;
+        
+        if (!clubId) {
+            return res.status(400).json({ error: 'clubId is required' });
+        }
+
+        // Get recent forms for this club (we'll use a simple approach for now)
+        const { data: forms, error: formsError } = await supabase
+            .from('forms')
+            .select(`
+                *,
+                sections (
+                    id,
+                    title,
+                    description,
+                    order_index,
+                    questions (
+                        id,
+                        question_text,
+                        question_type,
+                        options,
+                        scale,
+                        required,
+                        order_index
+                    )
+                )
+            `)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(parseInt(limit));
+
+        if (formsError) {
+            throw formsError;
+        }
+
+        // Transform form data to include structure
+        const transformedForms = forms.map(form => ({
+            id: form.id,
+            name: form.name,
+            event_identifier: form.event_identifier,
+            template_id: form.template_id,
+            status: form.status,
+            created_at: form.created_at,
+            allow_anonymous: form.allow_anonymous,
+            estimated_time: form.estimated_time,
+            structure: {
+                sections: form.sections.map(section => ({
+                    title: section.title,
+                    questions: section.questions.map(q => ({
+                        id: q.id,
+                        type: q.question_type,
+                        text: q.question_text,
+                        scale: q.scale,
+                        options: q.options
+                    }))
+                }))
+            }
+        }));
+
+        res.json(transformedForms);
+    } catch (error) {
+        console.error('Error fetching recent forms:', error);
+        res.status(500).json({ error: 'Failed to fetch recent forms', details: error.message });
+    }
+});
+
 // Get forms by event-id (simplified - no events table)
 app.get('/api/forms', async (req, res) => {
     try {

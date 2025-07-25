@@ -407,7 +407,7 @@ class GAA_FeedbackApp {
     async loadRecentForms() {
         try {
             // Get recent forms for this club (last 3 forms)
-            const response = await fetch(`/api/forms?event_id=${this.currentEventId}&limit=3&recent=true`);
+            const response = await fetch(`/api/forms/recent/${this.currentClubId}?limit=3`);
             if (!response.ok) throw new Error('Failed to load recent forms');
             
             const forms = await response.json();
@@ -452,12 +452,22 @@ class GAA_FeedbackApp {
                     </div>
                 </div>
                 <div class="form-actions">
+                    <button class="btn btn-sm btn-primary" onclick="window.app.loadExistingForm('${form.id}')">
+                        <i class="fas fa-folder-open"></i> Load
+                    </button>
                     <button class="btn btn-sm btn-outline" onclick="window.app.duplicateForm('${form.id}')">
                         <i class="fas fa-copy"></i> Duplicate
                     </button>
                 </div>
             </div>
         `;
+        
+        // Add click handler to load form when card is clicked (excluding buttons)
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.form-actions')) {
+                this.loadExistingForm(form.id);
+            }
+        });
         
         return card;
     }
@@ -520,6 +530,47 @@ class GAA_FeedbackApp {
         } catch (error) {
             console.error('Error duplicating form:', error);
             this.showAlert('Failed to duplicate form. Please try again.', 'error');
+        }
+    }
+    
+    async loadExistingForm(formId) {
+        try {
+            console.log('Loading existing form:', formId);
+            
+            // Get the form data from recent forms or all forms
+            const response = await fetch(`/api/forms/recent/${this.currentClubId}`);
+            let forms = [];
+            
+            if (response.ok) {
+                forms = await response.json();
+            }
+            
+            // If not found in recent, try general forms endpoint
+            if (!forms.find(f => f.id === formId)) {
+                const generalResponse = await fetch(`/api/forms?event_id=${this.currentEventId}`);
+                if (generalResponse.ok) {
+                    const generalForms = await generalResponse.json();
+                    forms = [...forms, ...generalForms];
+                }
+            }
+            
+            const formToLoad = forms.find(f => f.id === formId);
+            
+            if (!formToLoad) {
+                throw new Error('Form not found');
+            }
+            
+            // Set this as the current form
+            this.currentForm = formToLoad;
+            
+            // Display the form in the coach interface
+            this.showCoachFormArea();
+            
+            console.log('Form loaded successfully:', formToLoad);
+            
+        } catch (error) {
+            console.error('Error loading form:', error);
+            this.showAlert('Failed to load form. Please try again.', 'error');
         }
     }
     
@@ -921,18 +972,6 @@ class GAA_FeedbackApp {
         });
     }
     
-    selectTemplate(template) {
-        // Remove selection from all cards
-        document.querySelectorAll('.template-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        
-        // Add selection to clicked card
-        event.target.closest('.template-card').classList.add('selected');
-        
-        this.selectedTemplate = template;
-        document.getElementById('create-form-btn').disabled = false;
-    }
     
     async createFormFromTemplate() {
         if (!this.selectedTemplate) return;
@@ -978,7 +1017,6 @@ class GAA_FeedbackApp {
         if (this.currentForm && this.currentForm.id) {
             this.showCoachFormArea();
         } else {
-            document.getElementById('create-form-btn').disabled = true;
             this.showCoachNoForm();
         }
     }
