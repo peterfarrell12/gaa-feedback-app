@@ -381,7 +381,7 @@ app.post('/api/forms/create', async (req, res) => {
             const { data: formData, error: insertError } = await supabase
                 .from('forms')
                 .insert({
-                    name: customizations.name || `${template.name} - Event ${eventId}`,
+                    name: customizations.name || template.name,
                     template_id: templateId,
                     event_identifier: eventId,
                     created_by: customizations.created_by || null,
@@ -402,7 +402,7 @@ app.post('/api/forms/create', async (req, res) => {
                 const { data: formData, error: insertError } = await supabase
                     .from('forms')
                     .insert({
-                        name: customizations.name || `${template.name} - Event ${eventId}`,
+                        name: customizations.name || template.name,
                         template_id: templateId,
                         created_by: customizations.created_by || null,
                         status: 'active',

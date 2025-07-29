@@ -83,7 +83,7 @@ class GAA_FeedbackApp {
     formatUserName(nameParam) {
         if (!nameParam) return 'Player';
         return nameParam.split('-').map(word => 
-            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            word.charAt(0).toUpperCase() + word.slice(1)
         ).join(' ');
     }
 
