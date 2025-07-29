@@ -1872,7 +1872,7 @@ class GAA_FeedbackApp {
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Response 1', 'Response 5', 'Response 10', 'Response 15'],
+                labels: ['Player 1', 'Player 5', 'Player 10', 'Player 15'],
                 datasets: [{
                     label: 'Completion Time (min)',
                     data: [5, 4, 6, 3],
@@ -1946,7 +1946,7 @@ class GAA_FeedbackApp {
             html += `
                 <div class="response-card">
                     <div class="response-header">
-                        <h4>Response #${index + 1}</h4>
+                        <h4>Player Response</h4>
                         <div class="response-meta">
                             <span class="response-time">${completionTime} min</span>
                             <span class="response-date">${submittedDate}</span>
@@ -2025,7 +2025,7 @@ class GAA_FeedbackApp {
                             ${data.answers.map((answer, index) => `
                                 <div class="individual-response-item">
                                     <div class="response-meta">
-                                        <span class="response-number">Response #${index + 1}</span>
+                                        <span class="response-number">Player ${index + 1}</span>
                                     </div>
                                     <div class="response-content">${answer}</div>
                                 </div>
