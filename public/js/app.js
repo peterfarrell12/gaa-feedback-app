@@ -829,7 +829,7 @@ class GAA_FeedbackApp {
                         templateId: this.selectedTemplate.id,
                         eventId: this.currentEventId,
                         customizations: {
-                            name: `${this.selectedTemplate.name} - Event ${this.currentEventId}`,
+                            name: this.selectedTemplate.name,
                             created_by: this.currentUserId,
                             allow_anonymous: false
                         }
@@ -861,7 +861,7 @@ class GAA_FeedbackApp {
                 
                 this.currentForm = {
                     id: generateUUID(),
-                    name: `${this.selectedTemplate.name} - Event ${this.currentEventId}`,
+                    name: this.selectedTemplate.name,
                     event_identifier: this.currentEventId,
                     structure: this.generateMockFormStructure(this.selectedTemplate),
                     created_by: this.currentUserId,
@@ -981,7 +981,7 @@ class GAA_FeedbackApp {
                     templateId: this.selectedTemplate.id,
                     eventId: this.currentEventId,
                     customizations: {
-                        name: `${this.selectedTemplate.name} - Event ${this.currentEventId}`
+                        name: this.selectedTemplate.name
                     }
                 })
             });
@@ -2952,7 +2952,7 @@ class GAA_FeedbackApp {
         }
         
         const formData = {
-            name: `Custom Form - Event ${this.currentEventId}`,
+            name: "Custom Form",
             event_identifier: this.currentEventId,
             sections: this.formBuilder.sections
         };

@@ -3567,7 +3567,10 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
-    margin-bottom: 24px;
+    margin: 0 auto 24px auto;
+    padding: 0 16px;
+    width: 100%;
+    max-width: 1200px;
 }
 
 /* Tablet and up - 2 columns */
@@ -3575,6 +3578,7 @@ body {
     .analytics-cards {
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
+        padding: 0 24px;
     }
 }
 
@@ -3583,7 +3587,8 @@ body {
     .analytics-cards {
         grid-template-columns: repeat(3, 1fr);
         margin-bottom: 30px;
-        max-width: 900px;
+        padding: 0 32px;
+        gap: 24px;
     }
 }
 
