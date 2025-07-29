@@ -618,12 +618,59 @@ class GAA_FeedbackApp {
     }
 
     showRenameForm() {
-        const currentName = document.getElementById('form-title').textContent;
-        const newName = prompt('Enter new form name:', currentName);
+        const titleElement = document.getElementById('form-title');
+        const currentName = titleElement.textContent;
         
-        if (newName && newName.trim() !== '' && newName.trim() !== currentName) {
-            this.renameForm(newName.trim());
-        }
+        // Create inline input field
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentName;
+        input.className = 'form-title-input';
+        input.style.cssText = `
+            font-size: inherit;
+            font-weight: inherit;
+            border: 2px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 4px 8px;
+            background: white;
+            width: 100%;
+            max-width: 400px;
+        `;
+        
+        // Replace title with input
+        titleElement.style.display = 'none';
+        titleElement.parentNode.insertBefore(input, titleElement);
+        input.focus();
+        input.select();
+        
+        // Handle save/cancel
+        const saveEdit = () => {
+            const newName = input.value.trim();
+            if (newName && newName !== currentName) {
+                this.renameForm(newName);
+            }
+            // Restore original title
+            titleElement.textContent = newName || currentName;
+            titleElement.style.display = '';
+            input.remove();
+        };
+        
+        const cancelEdit = () => {
+            titleElement.style.display = '';
+            input.remove();
+        };
+        
+        // Event listeners
+        input.addEventListener('blur', saveEdit);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveEdit();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                cancelEdit();
+            }
+        });
     }
     
     async renameForm(newName) {
@@ -955,7 +1002,6 @@ class GAA_FeedbackApp {
         this.hideAllPlayerScreens();
         document.getElementById('player-no-form').classList.remove('hidden');
         document.getElementById('player-no-form').classList.add('active');
-        document.getElementById('event-name-player').textContent = `Event ${this.currentEventId}`;
     }
     
     showPlayerFormViewer() {
@@ -984,10 +1030,6 @@ class GAA_FeedbackApp {
             console.error('❌ Form builder element not found');
         }
         
-        const eventNameEl = document.getElementById('event-name-builder');
-        if (eventNameEl) {
-            eventNameEl.textContent = `Event ${this.currentEventId}`;
-        }
         
         this.initializeFormBuilder();
     }
@@ -3131,7 +3173,6 @@ class GAA_FeedbackApp {
         let previewHTML = `
             <div class="preview-header" style="padding: 20px; border-bottom: 1px solid #eee; background: #f8f9fa; position: relative;">
                 <h2 style="margin: 0; color: #333; padding-right: 60px;">Form Preview</h2>
-                <p style="margin: 8px 0 0 0; color: #666;">Event: ${this.currentEventId}</p>
                 <button onclick="window.app.closePreview()" style="position: absolute; top: 15px; right: 15px; background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;">
                     <i class="fas fa-times"></i>
                 </button>
