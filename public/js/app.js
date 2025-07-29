@@ -468,8 +468,8 @@ class GAA_FeedbackApp {
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button class="btn btn-sm btn-primary" onclick="window.app.loadExistingForm('${form.id}')">
-                        <i class="fas fa-folder-open"></i> Load
+                    <button class="btn btn-sm btn-primary" onclick="window.app.viewExistingForm('${form.id}')">
+                        <i class="fas fa-eye"></i> View
                     </button>
                     <button class="btn btn-sm btn-outline" onclick="window.app.duplicateForm('${form.id}')">
                         <i class="fas fa-copy"></i> Duplicate
@@ -478,10 +478,10 @@ class GAA_FeedbackApp {
             </div>
         `;
         
-        // Add click handler to load form when card is clicked (excluding buttons)
+        // Add click handler to view form when card is clicked (excluding buttons)
         card.addEventListener('click', (e) => {
             if (!e.target.closest('.form-actions')) {
-                this.loadExistingForm(form.id);
+                this.viewExistingForm(form.id);
             }
         });
         
@@ -588,6 +588,11 @@ class GAA_FeedbackApp {
             console.error('Error loading form:', error);
             this.showAlert('Failed to load form. Please try again.', 'error');
         }
+    }
+    
+    // Alias for viewExistingForm - same functionality as loadExistingForm
+    async viewExistingForm(formId) {
+        return this.loadExistingForm(formId);
     }
     
     async sendNotification() {
@@ -814,7 +819,11 @@ class GAA_FeedbackApp {
         // Create modal overlay
         const modalOverlay = document.createElement('div');
         modalOverlay.className = 'modal-overlay';
-        modalOverlay.onclick = () => this.closeTemplatePreview();
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                this.closeTemplatePreview();
+            }
+        });
         console.log('🎨 Modal overlay created');
         
         // Create modal content
@@ -905,9 +914,56 @@ class GAA_FeedbackApp {
         if (modalOverlay) {
             modalOverlay.classList.remove('active');
             setTimeout(() => {
-                document.body.removeChild(modalOverlay);
+                if (modalOverlay.parentNode) {
+                    modalOverlay.parentNode.removeChild(modalOverlay);
+                }
             }, 300);
         }
+    }
+    
+    generateMockFormStructure(template) {
+        // Generate a proper form structure based on template type
+        const baseQuestions = {
+            match: [
+                { text: "How would you rate your overall performance today?", type: "scale", scale: { min: 1, max: 10, step: 1 } },
+                { text: "What was your best moment in the game?", type: "text" },
+                { text: "Which areas need improvement?", type: "multiple_choice", options: ["Passing", "Shooting", "Defending", "Communication", "Fitness"] },
+                { text: "How well did the team work together?", type: "scale", scale: { min: 1, max: 10, step: 1 } },
+                { text: "Any suggestions for the next training session?", type: "text" }
+            ],
+            training: [
+                { text: "How challenging was today's training?", type: "scale", scale: { min: 1, max: 10, step: 1 } },
+                { text: "Which drills were most beneficial?", type: "multiple_choice", options: ["Passing", "Shooting", "Fitness", "Tactical", "Set Pieces"] },
+                { text: "What would you like to focus on next session?", type: "text" },
+                { text: "Rate your energy level after training", type: "scale", scale: { min: 1, max: 10, step: 1 } }
+            ],
+            tactical: [
+                { text: "How well did you understand today's tactical approach?", type: "scale", scale: { min: 1, max: 10, step: 1 } },
+                { text: "Which tactical elements need more work?", type: "multiple_choice", options: ["Formation", "Positioning", "Movement", "Communication", "Set Pieces"] },
+                { text: "Suggestions for tactical improvements?", type: "text" }
+            ]
+        };
+        
+        const questions = baseQuestions[template.type] || baseQuestions.match;
+        
+        return {
+            sections: [
+                {
+                    title: `${template.name} Assessment`,
+                    description: `Feedback for ${template.type} session`,
+                    questions: questions.map(q => ({
+                        text: q.text,
+                        type: q.type,
+                        options: q.options || null,
+                        scale: q.scale || null,
+                        required: true,
+                        club_identifier: this.currentClubId,
+                        anonymous: false,
+                        question_bank: false
+                    }))
+                }
+            ]
+        };
     }
     
     useTemplate() {
