@@ -574,6 +574,49 @@ class GAA_FeedbackApp {
         }
     }
     
+    async sendNotification() {
+        try {
+            const sendBtn = document.getElementById('send-notification-btn');
+            const originalText = sendBtn.innerHTML;
+            
+            // Show loading state
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            sendBtn.disabled = true;
+            
+            console.log('Sending notification with:', {
+                'event-id': this.currentEventId,
+                'user-id': this.currentUserId
+            });
+            
+            const response = await fetch('https://app.teamsync.ie/version-test/api/1.1/wf/create_feedback_notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'event-id': this.currentEventId,
+                    'user-id': this.currentUserId
+                })
+            });
+            
+            if (response.ok) {
+                this.showAlert('Notification sent successfully to all players!', 'success');
+                console.log('Notification sent successfully');
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+        } catch (error) {
+            console.error('Error sending notification:', error);
+            this.showAlert('Failed to send notification. Please try again.', 'error');
+        } finally {
+            // Reset button state
+            const sendBtn = document.getElementById('send-notification-btn');
+            sendBtn.innerHTML = '<i class="fas fa-bell"></i> Send Notification';
+            sendBtn.disabled = false;
+        }
+    }
+
     showRenameForm() {
         const currentName = document.getElementById('form-title').textContent;
         const newName = prompt('Enter new form name:', currentName);
@@ -890,6 +933,16 @@ class GAA_FeedbackApp {
         
         // Update form title
         document.getElementById('form-title').textContent = this.currentForm.name;
+        
+        // Show/hide notification button based on user type
+        const notificationBtn = document.getElementById('send-notification-btn');
+        if (notificationBtn) {
+            if (this.currentUserType === 'coach') {
+                notificationBtn.style.display = 'inline-flex';
+            } else {
+                notificationBtn.style.display = 'none';
+            }
+        }
         
         // Load analytics data
         this.loadAnalytics();

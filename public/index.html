@@ -231,9 +231,14 @@
                         <div class="screen-header">
                             <div class="form-title-section">
                                 <h2 id="form-title">Form Title</h2>
-                                <button class="btn-icon" id="rename-form-btn" onclick="window.app.showRenameForm()" title="Rename Form">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                                <div class="form-title-actions">
+                                    <button class="btn btn-primary btn-sm" id="send-notification-btn" onclick="window.app.sendNotification()" title="Send Notification to Players">
+                                        <i class="fas fa-bell"></i> Send Notification
+                                    </button>
+                                    <button class="btn-icon" id="rename-form-btn" onclick="window.app.showRenameForm()" title="Rename Form">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -460,6 +465,6 @@
         </main>
     </div>
 
-    <script src="js/app.js?v=1752829600"></script>
+    <script src="js/app.js?v=1752829700"></script>
 </body>
 </html>

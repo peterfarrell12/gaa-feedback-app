@@ -1863,13 +1863,20 @@ body {
 .form-title-section {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 12px;
     margin-bottom: 8px;
 }
 
 .form-title-section h2 {
     margin: 0;
+    flex: 1;
+}
+
+.form-title-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .btn-icon {
