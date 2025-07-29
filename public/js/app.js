@@ -1009,6 +1009,9 @@ class GAA_FeedbackApp {
             }
         }
         
+        // Load data for default tab (responses)
+        this.loadResponses();
+        
         // Load analytics data
         this.loadAnalytics();
         
@@ -1411,7 +1414,19 @@ class GAA_FeedbackApp {
         }
         
         // Calculate completion time
-        const completionTime = Math.round((Date.now() - this.formState.startTime) / 1000);
+        let completionTime;
+        if (this.isEditingResponse && this.existingResponse && this.existingResponse.completionTime) {
+            // Preserve original completion time when editing
+            completionTime = this.existingResponse.completionTime;
+        } else if (this.formState && this.formState.startTime) {
+            // Calculate new completion time for fresh submissions
+            completionTime = Math.round((Date.now() - this.formState.startTime) / 1000);
+        } else {
+            // Fallback if startTime is missing - estimate based on form length
+            const questionCount = this.currentForm?.structure?.sections?.reduce((total, section) => 
+                total + (section.questions?.length || 0), 0) || 5;
+            completionTime = Math.max(60, questionCount * 30); // Minimum 1 minute, 30 seconds per question
+        }
         
         if (!this.currentUserId) {
             this.showNotification('User ID is required to submit response.', 'error');
