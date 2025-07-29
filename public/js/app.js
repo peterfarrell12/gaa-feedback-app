@@ -49,6 +49,7 @@ class GAA_FeedbackApp {
         const clubIdParam = urlParams.get('club-id');
         const userIdParam = urlParams.get('user-id');
         const userTypeParam = urlParams.get('user-type');
+        const userNameParam = urlParams.get('user-name');
         
         console.log('🔍 Full URL:', window.location.href);
         console.log('🔍 Search params:', window.location.search);
@@ -60,6 +61,7 @@ class GAA_FeedbackApp {
         this.currentEventId = eventIdParam;
         this.currentClubId = clubIdParam; // Optional parameter
         this.currentUserId = userIdParam; // Required parameter for tracking individual users from Bubble
+        this.currentUserName = userNameParam; // Optional parameter for display names
         
         // Set user type based on user-type parameter (if provided)
         if (userTypeParam && userTypeParam.toLowerCase() === 'coach') {
@@ -71,9 +73,23 @@ class GAA_FeedbackApp {
         console.log('✅ Event ID from URL:', eventIdParam);
         console.log('✅ Club ID from URL:', clubIdParam || 'Not provided');
         console.log('✅ User ID from URL:', userIdParam);
+        console.log('✅ User Name from URL:', userNameParam || 'Not provided');
         console.log('✅ User Type from URL:', userTypeParam);
         console.log('✅ Set user type to:', this.currentUserType);
         console.log('✅ this.currentClubId set to:', this.currentClubId);
+    }
+
+    // Helper function to format user names from peter-farrell to Peter Farrell
+    formatUserName(nameParam) {
+        if (!nameParam) return 'Player';
+        return nameParam.split('-').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+    }
+
+    // Get display name for current user
+    getCurrentUserDisplayName() {
+        return this.formatUserName(this.currentUserName);
     }
     
     validateRequiredParameters() {
@@ -585,7 +601,8 @@ class GAA_FeedbackApp {
             
             console.log('Sending notification with:', {
                 'event-id': this.currentEventId,
-                'user-id': this.currentUserId
+                'user-id': this.currentUserId,
+                'user-name': this.currentUserName
             });
             
             const response = await fetch('https://app.teamsync.ie/version-test/api/1.1/wf/create_feedback_notification', {
@@ -595,7 +612,8 @@ class GAA_FeedbackApp {
                 },
                 body: JSON.stringify({
                     'event-id': this.currentEventId,
-                    'user-id': this.currentUserId
+                    'user-id': this.currentUserId,
+                    'user-name': this.currentUserName
                 })
             });
             
@@ -1127,7 +1145,7 @@ class GAA_FeedbackApp {
         
         // Update form info
         document.getElementById('estimated-time').innerHTML = `<i class="fas fa-clock"></i> ${this.currentForm.estimated_time || '~5 minutes'}`;
-        document.getElementById('player-id-display').textContent = this.currentUserId;
+        document.getElementById('player-name-display').textContent = this.getCurrentUserDisplayName();
         
         // Set up sections
         document.getElementById('total-sections').textContent = this.currentForm.structure.sections.length;
@@ -1565,8 +1583,7 @@ class GAA_FeedbackApp {
         
         // Set header information
         document.getElementById('existing-response-form-title').textContent = this.currentForm.name;
-        document.getElementById('existing-response-event').textContent = this.currentEventId;
-        document.getElementById('existing-response-player-id').textContent = this.currentUserId;
+        document.getElementById('existing-response-player-name').textContent = this.getCurrentUserDisplayName();
         
         // Format and display submission date
         let submissionDate;
