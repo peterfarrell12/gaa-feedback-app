@@ -1428,6 +1428,7 @@ class GAA_FeedbackApp {
         const submissionData = {
             formId: this.currentForm.id,
             userId: this.currentUserId,
+            userName: this.currentUserName,
             responses: this.responses,
             completionTimeSeconds: completionTime,
             eventId: this.currentEventId,
@@ -1943,10 +1944,12 @@ class GAA_FeedbackApp {
             }
             const completionTime = Math.round(response.completionTime / 60);
             
+            const playerName = this.formatUserName(response.userName) || 'Player';
+            
             html += `
                 <div class="response-card">
                     <div class="response-header">
-                        <h4>Player Response</h4>
+                        <h4>${playerName}</h4>
                         <div class="response-meta">
                             <span class="response-time">${completionTime} min</span>
                             <span class="response-date">${submittedDate}</span>
@@ -1990,10 +1993,16 @@ class GAA_FeedbackApp {
                     questionData[questionId] = {
                         question: answerData.question,
                         type: answerData.questionType,
-                        answers: []
+                        answers: [],
+                        responseDetails: []
                     };
                 }
                 questionData[questionId].answers.push(answerData.answer);
+                questionData[questionId].responseDetails.push({
+                    answer: answerData.answer,
+                    userName: response.userName,
+                    userId: response.userId
+                });
             });
         });
         
@@ -2022,14 +2031,17 @@ class GAA_FeedbackApp {
                             <h6><i class="fas fa-comments"></i> Individual Responses</h6>
                         </div>
                         <div class="individual-responses-list">
-                            ${data.answers.map((answer, index) => `
-                                <div class="individual-response-item">
-                                    <div class="response-meta">
-                                        <span class="response-number">Player ${index + 1}</span>
+                            ${data.responseDetails.map((responseDetail, index) => {
+                                const playerName = this.formatUserName(responseDetail.userName) || `Player ${index + 1}`;
+                                return `
+                                    <div class="individual-response-item">
+                                        <div class="response-meta">
+                                            <span class="response-number">${playerName}</span>
+                                        </div>
+                                        <div class="response-content">${responseDetail.answer}</div>
                                     </div>
-                                    <div class="response-content">${answer}</div>
-                                </div>
-                            `).join('')}
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                 </div>

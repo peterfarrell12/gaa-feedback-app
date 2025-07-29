@@ -676,11 +676,12 @@ app.get('/api/questions/club/:clubId', async (req, res) => {
 // Submit response (create new or update existing)
 app.post('/api/responses/submit', async (req, res) => {
     try {
-        const { formId, userId, responses, completionTimeSeconds, eventId, clubId, isUpdate = false } = req.body;
+        const { formId, userId, userName, responses, completionTimeSeconds, eventId, clubId, isUpdate = false } = req.body;
 
         console.log('Received response submission:', {
             formId,
             userId,
+            userName,
             responses,
             completionTimeSeconds,
             eventId,
@@ -751,6 +752,7 @@ app.post('/api/responses/submit', async (req, res) => {
                 .insert({
                     form_id: formId,
                     user_id: String(userId), // Ensure it's a string
+                    user_name: userName, // Add user_name to the response
                     is_anonymous: false,
                     completion_time_seconds: completionTimeSeconds || 0
                 })
@@ -1014,6 +1016,8 @@ app.get('/api/forms/:formId/responses', async (req, res) => {
 
             return {
                 id: response.id,
+                userId: response.user_id,
+                userName: response.user_name,
                 isAnonymous: response.is_anonymous,
                 completionTime: response.completion_time_seconds,
                 submittedAt: new Date().toISOString(), // Placeholder since we don't have created_at
