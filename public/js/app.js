@@ -490,7 +490,7 @@ class GAA_FeedbackApp {
     
     async duplicateForm(formId) {
         try {
-            console.log('Duplicating form:', formId);
+            console.log('📋 duplicateForm called with formId:', formId);
             
             // Get the form data
             const response = await fetch(`/api/forms?event_id=${this.currentEventId}`);
@@ -592,6 +592,7 @@ class GAA_FeedbackApp {
     
     // Alias for viewExistingForm - same functionality as loadExistingForm
     async viewExistingForm(formId) {
+        console.log('🔍 viewExistingForm called with formId:', formId);
         return this.loadExistingForm(formId);
     }
     
@@ -967,6 +968,7 @@ class GAA_FeedbackApp {
     }
     
     useTemplate() {
+        console.log('🚀 useTemplate called');
         this.closeTemplatePreview();
         this.createFormFromTemplate();
     }
