@@ -888,9 +888,8 @@ class GAA_FeedbackApp {
         document.getElementById('coach-form-area').classList.remove('hidden');
         document.getElementById('coach-form-area').classList.add('active');
         
-        // Update form title and event name
+        // Update form title
         document.getElementById('form-title').textContent = this.currentForm.name;
-        document.getElementById('event-name-area').textContent = `Event ${this.currentEventId}`;
         
         // Load analytics data
         this.loadAnalytics();
@@ -910,10 +909,6 @@ class GAA_FeedbackApp {
         this.hideAllPlayerScreens();
         document.getElementById('player-form-viewer').classList.remove('hidden');
         document.getElementById('player-form-viewer').classList.add('active');
-        
-        // Update form title and event name
-        document.getElementById('player-form-title').textContent = this.currentForm.name;
-        document.getElementById('event-name-form').textContent = `Event ${this.currentEventId}`;
         
         // Render the form
         this.renderPlayerForm();
@@ -1035,9 +1030,7 @@ class GAA_FeedbackApp {
             startTime: Date.now()
         };
         
-        // Update form title and info
-        document.getElementById('player-form-title').textContent = this.currentForm.name;
-        document.getElementById('event-name-form').textContent = this.currentEventId;
+        // Update form info
         document.getElementById('estimated-time').innerHTML = `<i class="fas fa-clock"></i> ${this.currentForm.estimated_time || '~5 minutes'}`;
         document.getElementById('player-id-display').textContent = this.currentUserId;
         
