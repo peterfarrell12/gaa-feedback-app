@@ -1638,11 +1638,14 @@ class GAA_FeedbackApp {
             isUpdate: this.isEditingResponse
         };
         
-        console.log('Submitting response with data:', submissionData);
-        console.log('Form ID:', this.currentForm.id);
-        console.log('User ID:', this.currentUserId);
-        console.log('Responses:', this.responses);
-        console.log('Response count:', Object.keys(this.responses).length);
+        console.log('🚀 Submitting response with data:', submissionData);
+        console.log('📋 Form ID:', this.currentForm.id);
+        console.log('👤 User ID:', this.currentUserId, 'type:', typeof this.currentUserId);
+        console.log('👤 User Name:', this.currentUserName);
+        console.log('📝 Responses:', this.responses);
+        console.log('📊 Response count:', Object.keys(this.responses).length);
+        console.log('🎯 Event ID:', this.currentEventId);
+        console.log('🏢 Club ID:', this.currentClubId);
         
         try {
             // Try API submission first
@@ -1668,10 +1671,9 @@ class GAA_FeedbackApp {
                     errorMessage = errorText || `HTTP ${response.status}`;
                 }
                 
-                // For development, show success anyway since API might not be fully implemented
-                console.log('API failed, but showing success for development/testing');
-                this.showNotification(`API submission failed (${errorMessage}), but form completed successfully!`, 'warning');
-                this.showPlayerResponseSubmitted();
+                // Show the actual error instead of fake success
+                console.error('API submission failed with error:', errorMessage);
+                this.showNotification(`Failed to submit response: ${errorMessage}`, 'error');
                 return;
             }
             
@@ -1687,15 +1689,8 @@ class GAA_FeedbackApp {
         } catch (error) {
             console.error('Error submitting response:', error);
             
-            // For development/testing, show success even if API fails
-            console.log('Network/API error, but showing success for development/testing');
-            this.showNotification(`Submission error (${error.message}), but form completed successfully!`, 'warning');
-            
-            // Clear edit state
-            this.isEditingResponse = false;
-            this.existingResponse = null;
-            
-            this.showPlayerResponseSubmitted();
+            // Show the actual error instead of fake success
+            this.showNotification(`Network error: ${error.message}`, 'error');
         }
     }
     
