@@ -1664,9 +1664,12 @@ class GAA_FeedbackApp {
                 
                 // Try to parse error message
                 let errorMessage = 'Unknown error';
+                let errorDetails = null;
                 try {
                     const errorData = JSON.parse(errorText);
                     errorMessage = errorData.error || errorData.message || errorText;
+                    errorDetails = errorData;
+                    console.error('🚨 Detailed API error:', errorData);
                 } catch (e) {
                     errorMessage = errorText || `HTTP ${response.status}`;
                 }

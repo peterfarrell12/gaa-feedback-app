@@ -790,7 +790,12 @@ app.post('/api/responses/submit', async (req, res) => {
         console.log('Response record processed:', response.id);
 
         // Create question responses
+        console.log('🔍 Processing responses object:', responses);
+        console.log('🔍 Response entries count:', Object.entries(responses).length);
+        
         const questionResponses = Object.entries(responses).map(([questionId, answer]) => {
+            console.log('🔍 Processing question:', questionId, 'with answer:', answer, 'type:', typeof answer);
+            
             const questionResponse = {
                 response_id: response.id,
                 question_id: questionId
@@ -799,18 +804,22 @@ app.post('/api/responses/submit', async (req, res) => {
             // Store answer based on type
             if (typeof answer === 'number') {
                 questionResponse.answer_numeric = answer;
+                console.log('📊 Storing as numeric:', answer);
             } else if (typeof answer === 'string') {
                 if (answer === 'yes' || answer === 'no') {
                     questionResponse.answer_choice = answer;
+                    console.log('✅ Storing as choice:', answer);
                 } else {
                     questionResponse.answer_text = answer;
+                    console.log('📝 Storing as text:', answer);
                 }
             } else {
                 // Handle other types by converting to string
                 questionResponse.answer_text = String(answer);
+                console.log('🔄 Converting to text:', String(answer));
             }
 
-            console.log('Creating question response:', questionResponse);
+            console.log('📋 Final question response object:', questionResponse);
             return questionResponse;
         });
 
@@ -831,7 +840,9 @@ app.post('/api/responses/submit', async (req, res) => {
                 return res.status(500).json({ 
                     error: 'Failed to create question responses', 
                     details: questionsError.message,
-                    hint: questionsError.hint
+                    hint: questionsError.hint,
+                    code: questionsError.code,
+                    questionResponsesData: questionResponses.slice(0, 3) // First 3 for debugging
                 });
             }
 
