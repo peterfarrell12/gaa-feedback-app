@@ -3097,11 +3097,10 @@ class GAA_FeedbackApp {
                         <input type="checkbox" id="question-required" ${question.required !== false ? 'checked' : ''}>
                         <label for="question-required">Required</label>
                     </div>
-                    ${!question.id.startsWith('custom_') && !question.id.startsWith('q') ? `
                     <div class="checkbox-item">
                         <input type="checkbox" id="question-save-to-bank" ${question.question_bank ? 'checked' : ''}>
                         <label for="question-save-to-bank">Save to Bank (reusable for future forms)</label>
-                    </div>` : ''}
+                    </div>
                 </div>
                 
                 <div class="form-group">
