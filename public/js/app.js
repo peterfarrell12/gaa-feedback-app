@@ -445,10 +445,8 @@ class GAA_FeedbackApp {
         
         // Add click handler to show form preview popup (like templates)
         card.addEventListener('click', (e) => {
-            if (!e.target.closest('.form-actions')) {
-                console.log('🔍 Recent form card clicked, showing preview for:', form.name);
-                this.showFormPreview(form);
-            }
+            console.log('🔍 Recent form card clicked, showing preview for:', form.name);
+            this.showFormPreview(form);
         });
         
         card.innerHTML = `
@@ -688,11 +686,8 @@ class GAA_FeedbackApp {
                 <button class="btn btn-secondary" onclick="window.app.closeFormPreview()">
                     Cancel
                 </button>
-                <button class="btn btn-outline" onclick="window.app.duplicateFormFromPreview('${form.id}')">
+                <button class="btn btn-primary" onclick="window.app.duplicateFormFromPreview('${form.id}')">
                     <i class="fas fa-copy"></i> Duplicate
-                </button>
-                <button class="btn btn-primary" onclick="window.app.viewFormFromPreview('${form.id}')">
-                    <i class="fas fa-eye"></i> View Form
                 </button>
             </div>
         `;
@@ -718,11 +713,6 @@ class GAA_FeedbackApp {
                 }
             }, 300);
         }
-    }
-    
-    async viewFormFromPreview(formId) {
-        this.closeFormPreview();
-        return this.loadExistingForm(formId);
     }
     
     async duplicateFormFromPreview(formId) {
