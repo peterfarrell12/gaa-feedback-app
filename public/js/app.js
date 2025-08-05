@@ -1936,18 +1936,9 @@ class GAA_FeedbackApp {
     }
     
     updateAnalyticsDisplay(analytics) {
-        // Update basic metrics
-        document.getElementById('response-rate').textContent = analytics.responseRate + '%';
+        // Update only the remaining metrics
         document.getElementById('total-responses').textContent = analytics.totalResponses;
         document.getElementById('player-count').textContent = analytics.totalResponses + ' players';
-        document.getElementById('avg-completion-time').textContent = Math.round(analytics.averageCompletionTime / 60) + ' min';
-        
-        // Calculate engagement score
-        const engagementScore = Math.min(100, Math.round((analytics.responseRate + (analytics.totalResponses > 10 ? 30 : 0) + (analytics.averageCompletionTime < 300 ? 20 : 0))));
-        document.getElementById('engagement-score').textContent = engagementScore;
-        
-        // Update progress bar
-        document.getElementById('response-rate-progress').style.width = analytics.responseRate + '%';
         
         // Update insights
         this.updateInsights(analytics);
