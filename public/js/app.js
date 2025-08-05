@@ -736,7 +736,7 @@ class GAA_FeedbackApp {
                 'user-name': this.currentUserName
             });
             
-            const response = await fetch('https://app.teamsync.ie/version-test/api/1.1/wf/create_feedback_notification', {
+            const response = await fetch('https://app.teamsync.ie/version-live/api/1.1/wf/create_feedback_notification', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
