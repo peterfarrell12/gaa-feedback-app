@@ -442,6 +442,7 @@ class GAA_FeedbackApp {
         const sectionCount = form.structure?.sections?.length || 0;
         const questionCount = form.structure?.sections?.reduce((total, section) => total + (section.questions?.length || 0), 0) || 0;
         const createdDate = form.created_at ? new Date(form.created_at).toLocaleDateString() : 'Recently';
+        const estimatedTime = form.estimated_time ? form.estimated_time.replace('~', '').trim() : '5 min';
         
         // Add click handler to show form preview popup (like templates)
         card.addEventListener('click', (e) => {
@@ -473,7 +474,7 @@ class GAA_FeedbackApp {
                 </div>
                 <div class="template-stat">
                     <i class="fas fa-clock"></i>
-                    <span>${form.estimated_time || '~5 min'}</span>
+                    <span>${estimatedTime}</span>
                 </div>
             </div>
         `;
