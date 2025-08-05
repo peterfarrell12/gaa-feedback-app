@@ -801,22 +801,14 @@ app.post('/api/responses/submit', async (req, res) => {
                 question_id: questionId
             };
 
-            // Store answer based on type
+            // Store answer based on type - using only available columns
             if (typeof answer === 'number') {
                 questionResponse.answer_numeric = answer;
                 console.log('📊 Storing as numeric:', answer);
-            } else if (typeof answer === 'string') {
-                if (answer === 'yes' || answer === 'no') {
-                    questionResponse.answer_choice = answer;
-                    console.log('✅ Storing as choice:', answer);
-                } else {
-                    questionResponse.answer_text = answer;
-                    console.log('📝 Storing as text:', answer);
-                }
             } else {
-                // Handle other types by converting to string
+                // Store all non-numeric answers as text (since answer_choice column doesn't exist)
                 questionResponse.answer_text = String(answer);
-                console.log('🔄 Converting to text:', String(answer));
+                console.log('📝 Storing as text:', String(answer));
             }
 
             console.log('📋 Final question response object:', questionResponse);
