@@ -437,53 +437,48 @@ class GAA_FeedbackApp {
     createRecentFormCard(form) {
         const card = document.createElement('div');
         card.className = 'template-card recent-form-card';
+        card.style.cursor = 'pointer';
         
         const sectionCount = form.structure?.sections?.length || 0;
         const questionCount = form.structure?.sections?.reduce((total, section) => total + (section.questions?.length || 0), 0) || 0;
         const createdDate = form.created_at ? new Date(form.created_at).toLocaleDateString() : 'Recently';
         
+        // Add click handler to show form preview popup (like templates)
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.form-actions')) {
+                console.log('🔍 Recent form card clicked, showing preview for:', form.name);
+                this.showFormPreview(form);
+            }
+        });
+        
         card.innerHTML = `
-            <div class="template-content">
-                <div class="template-content-header">
-                    <div class="template-icon">
-                        <i class="fas fa-clipboard-list"></i>
-                    </div>
-                    <div class="template-info">
-                        <h3>${form.name}</h3>
-                        <p class="template-description">Custom form created ${createdDate}</p>
-                    </div>
+            <div class="template-content-header">
+                <div class="template-icon">
+                    <i class="fas fa-clipboard-check"></i>
                 </div>
+                <div class="template-text-content">
+                    <h3>${form.name}</h3>
+                    <p>Custom form created ${createdDate}</p>
+                </div>
+                <div class="template-badge">custom</div>
+            </div>
+            <div class="template-meta">
                 <div class="template-stats">
                     <div class="template-stat">
-                        <span class="stat-value">${sectionCount}</span>
-                        <span class="stat-label">Sections</span>
+                        <i class="fas fa-layer-group"></i>
+                        <span>${sectionCount} sections</span>
                     </div>
                     <div class="template-stat">
-                        <span class="stat-value">${questionCount}</span>
-                        <span class="stat-label">Questions</span>
-                    </div>
-                    <div class="template-stat">
-                        <span class="stat-value">${form.estimated_time || '~5 min'}</span>
-                        <span class="stat-label">Duration</span>
+                        <i class="fas fa-question"></i>
+                        <span>${questionCount} questions</span>
                     </div>
                 </div>
-                <div class="form-actions">
-                    <button class="btn btn-sm btn-primary" onclick="window.app.viewExistingForm('${form.id}')">
-                        <i class="fas fa-eye"></i> View
-                    </button>
-                    <button class="btn btn-sm btn-outline" onclick="window.app.duplicateForm('${form.id}')">
-                        <i class="fas fa-copy"></i> Duplicate
-                    </button>
+                <div class="template-stat">
+                    <i class="fas fa-clock"></i>
+                    <span>${form.estimated_time || '~5 min'}</span>
                 </div>
             </div>
         `;
-        
-        // Add click handler to view form when card is clicked (excluding buttons)
-        card.addEventListener('click', (e) => {
-            if (!e.target.closest('.form-actions')) {
-                this.viewExistingForm(form.id);
-            }
-        });
         
         return card;
     }
@@ -492,16 +487,31 @@ class GAA_FeedbackApp {
         try {
             console.log('📋 duplicateForm called with formId:', formId);
             
-            // Get the form data
-            const response = await fetch(`/api/forms?event_id=${this.currentEventId}`);
-            if (!response.ok) throw new Error('Failed to load forms');
+            // Get the form data from recent forms first, then try all forms
+            let formToDuplicate = null;
+            let forms = [];
             
-            const forms = await response.json();
-            const formToDuplicate = forms.find(f => f.id === formId);
+            // Try recent forms first
+            const recentResponse = await fetch(`/api/forms/recent/${this.currentClubId}`);
+            if (recentResponse.ok) {
+                forms = await recentResponse.json();
+                formToDuplicate = forms.find(f => f.id === formId);
+            }
+            
+            // If not found in recent, try all forms for this event
+            if (!formToDuplicate) {
+                const allResponse = await fetch(`/api/forms?event_id=${this.currentEventId}`);
+                if (allResponse.ok) {
+                    const allForms = await allResponse.json();
+                    formToDuplicate = allForms.find(f => f.id === formId);
+                }
+            }
             
             if (!formToDuplicate) {
                 throw new Error('Form not found');
             }
+            
+            console.log('📋 Form to duplicate:', formToDuplicate);
             
             // Create a new form based on the existing one
             const duplicatedFormData = {
@@ -540,12 +550,12 @@ class GAA_FeedbackApp {
             console.log('Form duplicated successfully:', newForm);
             
             // Refresh the interface
-            this.showAlert('Form duplicated successfully!', 'success');
+            this.showNotification('Form duplicated successfully!', 'info');
             this.renderRecentForms();
             
         } catch (error) {
             console.error('Error duplicating form:', error);
-            this.showAlert('Failed to duplicate form. Please try again.', 'error');
+            this.showNotification('Failed to duplicate form. Please try again.', 'error');
         }
     }
     
@@ -586,7 +596,7 @@ class GAA_FeedbackApp {
             
         } catch (error) {
             console.error('Error loading form:', error);
-            this.showAlert('Failed to load form. Please try again.', 'error');
+            this.showNotification('Failed to load form. Please try again.', 'error');
         }
     }
     
@@ -594,6 +604,130 @@ class GAA_FeedbackApp {
     async viewExistingForm(formId) {
         console.log('🔍 viewExistingForm called with formId:', formId);
         return this.loadExistingForm(formId);
+    }
+    
+    showFormPreview(form) {
+        console.log('🎨 showFormPreview called with:', form.name);
+        
+        // Create modal overlay
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                this.closeFormPreview();
+            }
+        });
+        
+        // Create modal content
+        const modal = document.createElement('div');
+        modal.className = 'template-preview-modal';
+        modal.onclick = (e) => e.stopPropagation();
+        
+        const sectionCount = form.structure?.sections?.length || 0;
+        const questionCount = form.structure?.sections?.reduce((total, section) => total + (section.questions?.length || 0), 0) || 0;
+        const createdDate = form.created_at ? new Date(form.created_at).toLocaleDateString() : 'Recently';
+        
+        // Get sample questions from the form
+        let sampleQuestions = [];
+        if (form.structure?.sections?.length > 0) {
+            form.structure.sections.forEach(section => {
+                if (section.questions && section.questions.length > 0) {
+                    sampleQuestions.push(...section.questions.slice(0, 3).map(q => q.text));
+                }
+            });
+        }
+        sampleQuestions = sampleQuestions.slice(0, 3);
+        
+        modal.innerHTML = `
+            <div class="modal-header">
+                <div class="template-preview-icon">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <div class="template-preview-info">
+                    <h2>${form.name}</h2>
+                    <p>Custom form created ${createdDate}</p>
+                    <div class="template-preview-badges">
+                        <span class="template-type-badge">custom</span>
+                        <span class="template-stat-badge">
+                            <i class="fas fa-clock"></i> ${form.estimated_time || '~5 min'}
+                        </span>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="window.app.closeFormPreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-section">
+                    <h3>What's included:</h3>
+                    <div class="preview-stats">
+                        <div class="preview-stat">
+                            <i class="fas fa-layer-group"></i>
+                            <span>${sectionCount} sections</span>
+                        </div>
+                        <div class="preview-stat">
+                            <i class="fas fa-question"></i>
+                            <span>${questionCount} questions</span>
+                        </div>
+                        <div class="preview-stat">
+                            <i class="fas fa-users"></i>
+                            <span>Custom form</span>
+                        </div>
+                    </div>
+                </div>
+                ${sampleQuestions.length > 0 ? `
+                <div class="preview-form-sample">
+                    <h4>Sample questions:</h4>
+                    <div class="sample-questions">
+                        ${sampleQuestions.map(q => `<div class="sample-question">${q}</div>`).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="window.app.closeFormPreview()">
+                    Cancel
+                </button>
+                <button class="btn btn-outline" onclick="window.app.duplicateFormFromPreview('${form.id}')">
+                    <i class="fas fa-copy"></i> Duplicate
+                </button>
+                <button class="btn btn-primary" onclick="window.app.viewFormFromPreview('${form.id}')">
+                    <i class="fas fa-eye"></i> View Form
+                </button>
+            </div>
+        `;
+        
+        modalOverlay.appendChild(modal);
+        document.body.appendChild(modalOverlay);
+        
+        // Trigger animation
+        setTimeout(() => {
+            modalOverlay.classList.add('active');
+        }, 10);
+        
+        console.log('✅ showFormPreview completed successfully');
+    }
+    
+    closeFormPreview() {
+        const modalOverlay = document.querySelector('.modal-overlay');
+        if (modalOverlay) {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => {
+                if (modalOverlay.parentNode) {
+                    modalOverlay.parentNode.removeChild(modalOverlay);
+                }
+            }, 300);
+        }
+    }
+    
+    async viewFormFromPreview(formId) {
+        this.closeFormPreview();
+        return this.loadExistingForm(formId);
+    }
+    
+    async duplicateFormFromPreview(formId) {
+        this.closeFormPreview();
+        return this.duplicateForm(formId);
     }
     
     async sendNotification() {
@@ -624,7 +758,7 @@ class GAA_FeedbackApp {
             });
             
             if (response.ok) {
-                this.showAlert('Notification sent successfully to all players!', 'success');
+                this.showNotification('Notification sent successfully to all players!', 'info');
                 console.log('Notification sent successfully');
             } else {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -632,7 +766,7 @@ class GAA_FeedbackApp {
             
         } catch (error) {
             console.error('Error sending notification:', error);
-            this.showAlert('Failed to send notification. Please try again.', 'error');
+            this.showNotification('Failed to send notification. Please try again.', 'error');
         } finally {
             // Reset button state
             const sendBtn = document.getElementById('send-notification-btn');
@@ -730,11 +864,11 @@ class GAA_FeedbackApp {
             document.getElementById('form-title').textContent = newName;
             
             console.log('Form renamed successfully');
-            this.showAlert('Form renamed successfully!', 'success');
+            this.showNotification('Form renamed successfully!', 'info');
             
         } catch (error) {
             console.error('Error renaming form:', error);
-            this.showAlert('Failed to rename form. Please try again.', 'error');
+            this.showNotification('Failed to rename form. Please try again.', 'error');
         }
     }
     
